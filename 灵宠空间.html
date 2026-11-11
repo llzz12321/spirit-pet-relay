@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>灵宠空间</title>
-<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-11T05:58:57Z">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-J/RAacJeZ1DU6WYYgkbtnnzqrIofKs8kSB5NTnv79fg='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-11T12:11:53Z">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-rg3xG1hQGXQNGC4gGlFsFZaTkzG/5HWKNbladwal/88='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <style>
 :root{--bg:#f5f5f4;--panel:#fff;--border:#e0ddd6;--text:#2a2823;--muted:#6f6c63;--accent:#3c6e5c;--danger:#b3452f;--warn:#8a5a1f}
 *{box-sizing:border-box}
@@ -16,7 +16,7 @@ h1{font-size:19px;margin:0}h2{font-size:15px;margin:0 0 4px}
 .meta,.sub,.hint{font-size:12px;color:var(--muted)}
 .hint{margin:0 0 10px}.mono{font-family:monospace}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
-.head-r{display:flex;flex-direction:column;align-items:flex-end;gap:6px}.head .row{justify-content:flex-end}
+.head .row{justify-content:flex-end}
 .grid{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 12px}
 .card{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:#fdfcfa;min-width:180px;max-width:240px;flex:1}
 .card b{font-size:14px;word-break:break-all}
@@ -42,7 +42,6 @@ footer{text-align:center}footer a{color:inherit}
 .dialog.wide{width:720px}.pv img,.pv video,.pv iframe{width:100%;border:0;border-radius:6px}.pv iframe{height:60vh}.pv img{max-height:60vh;object-fit:contain}.pv audio{width:100%}
 .pv img.ns{pointer-events:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .tool-desc{max-width:780px;margin:0 auto 8px;font-size:12px;color:var(--muted);text-align:left}
-.demo-tag{background:#e3f1e8;color:#3c6e5c;border:1px solid #b9d9c6;font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;letter-spacing:1px}
 .demo-banner{max-width:780px;margin:0 auto 12px;padding:10px 12px;border-radius:8px;background:#fff4d6;color:#8a5a1f;font-size:13px}
 .bulletin-link{font-size:12.5px;color:var(--accent);margin-left:4px}
 .bar{margin:8px 0 4px}.tag{font-size:11px;color:#fff;background:var(--accent);border-radius:4px;padding:0 5px;margin-left:6px;white-space:nowrap}
@@ -51,7 +50,7 @@ footer{text-align:center}footer a{color:inherit}
 #cText::placeholder{color:#c4c1b8;font-style:italic}#iTxt::placeholder{color:#c4c1b8;font-style:italic}
 .tip-blue{color:#2c6fb0;font-style:italic;font-size:12.5px;margin-top:12px}
 #cKeys{max-height:160px;overflow:auto}
-@media(max-width:480px){.card{min-width:100%;max-width:100%}body{padding:12px}.dialog input,.dialog textarea{font-size:16px!important}button{min-height:36px}.head-r{align-items:flex-start}.head .row{justify-content:flex-start}}
+@media(max-width:480px){.card{min-width:100%;max-width:100%}body{padding:12px}.dialog input,.dialog textarea{font-size:16px!important}button{min-height:36px}.head .row{justify-content:flex-start}}
 html{-webkit-text-size-adjust:100%}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .overlay,.dialog{overscroll-behavior:contain}.dialog{max-height:85vh;max-height:85dvh;-webkit-overflow-scrolling:touch}
 .env-warn{max-width:780px;margin:0 auto 12px;padding:10px 12px;border-radius:8px;background:#fbeae6;color:var(--danger);font-size:13px}
@@ -84,7 +83,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
 #cBack{display:inline-flex;align-items:center;justify-content:center;padding:0 12px 0 4px;min-height:44px;min-width:36px;margin:-6px 0}.dialog h3.ch .ib{padding:8px;min-height:36px}
 #cRel summary{list-style:none;color:var(--muted);font-size:12px}#cRel summary::-webkit-details-marker{display:none}#cRel summary::after{content:">";display:inline-block;margin-left:6px;transition:transform .15s}#cRel[open] summary::after{transform:rotate(90deg)}
 #rName{border:0!important;border-bottom:1px dashed var(--border)!important;border-radius:0!important;background:transparent!important;padding:3px 0!important;font-size:12px!important;color:var(--muted)}#rName:focus{outline:none;border-bottom:1px solid var(--accent)!important;color:var(--text)}
-.msg.me .mh:first-child{text-align:right}.vip{color:var(--accent);font-weight:700}.msg .cpl{display:none}.msg.sel .cpl{display:block;margin:0 0 4px}
+.msg.me .mh:first-child{text-align:right}.msg .cpl{display:none}.msg.sel .cpl{display:block;margin:0 0 4px}
 @media(max-width:480px){#rName{font-size:16px!important;width:133.33%!important;transform:scale(.75);transform-origin:left center}}
 .msg .card-actions{display:none}.msg.sel .card-actions{display:flex}.msg.sel{outline:1px solid var(--accent)}
 .chat{display:flex;align-items:center;gap:10px}.cb{flex:1;min-width:0}
@@ -93,7 +92,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
 #idList.grid{display:block;margin:10px 0 12px}
 .card.ident{min-width:0;max-width:none;width:100%;margin-bottom:6px;padding:8px 12px}
 .grp{font-size:12px;font-weight:700;color:var(--muted);margin:12px 2px 6px;letter-spacing:1px}.grp:first-child{margin-top:2px}
-.ph b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ph .tag{flex-shrink:0}.ph .vip{flex-shrink:0;margin-left:6px}.ph .arr{flex-shrink:0;margin-left:4px;transition:transform .15s}.card.ident.open .arr{transform:rotate(180deg)}
+.ph b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ph .tag{flex-shrink:0}.ph .arr{flex-shrink:0;margin-left:4px;transition:transform .15s}.card.ident.open .arr{transform:rotate(180deg)}
 #lockBar{display:flex;align-items:center;justify-content:space-between;gap:8px}
 </style>
 </head>
@@ -113,7 +112,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
 </section>
 
 <div class="demo-banner" id="lockBar" style="display:none"></div>
-<div class="tabbar" id="tabs"><button class="ptab on" data-p="chat">会话</button><button class="ptab" data-p="friend">好友/群友</button><button class="ptab" data-p="mine">我的灵宠</button></div>
+<div class="tabbar" id="tabs"><button class="ptab on" data-p="chat">会话</button><button class="ptab" data-p="friend">好友</button><button class="ptab" data-p="mine">我的灵宠</button></div>
 
 <section id="panelChat">
   <div class="row bar"><button id="btnNewChat">写信</button><button id="btnImpLetter">收信·手动</button><button id="btnRelay" style="display:none">收信·中转</button></div>
@@ -136,7 +135,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
 <!-- 部署配置（部署脚本只需改写下面的 JSON，请勿改动其他脚本内容，否则 CSP 哈希失效）：bulletinUrl / bulletinExpires 张贴栏链接（https）及有效期 YYYY-MM-DD，过期后自动不显示；repoUrl 源码仓库链接（https，可空，显示在页脚和技术说明）；contactUrl “联系我”页面的链接（https，作者的灵宠名片），contactId 该灵宠的 id（可空）；relays 中转白名单（https，须与 CSP 的 connect-src 一致，建议用“导出模板”生成）。 -->
 <script id="deploy-config" type="application/json">{"bulletinUrl":"","bulletinExpires":"","contactUrl":"","contactId":"","repoUrl":"https://github.com/llzz12321/spirit-pet-relay"}</script>
 <script id="container-json" type="application/json">
-{"meta":{"spaceName":"灵宠空间","version":"0.30.8"},"identities":[],"letters":[]}
+{"meta":{"spaceName":"灵宠空间","version":"0.30.10"},"identities":[],"letters":[]}
 </script>
 
 <script>
@@ -152,7 +151,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
    中转开关：identity.relay（仅本地；启用后经住地中转站收发信件和回执；与口令锁定无关）
    未读：state.reads[信件id].n = 1（新收到、尚未打开会话；用于红点）
    信件字段：sender（寄信人）、kind（text / file）*/
-const VERSION='0.30.8';
+const VERSION='0.30.10';
 const DATA_SCHEMA=1,LETTER_V=1,SEAL_V=1; // 数据结构版本（备份文件/本地库）、信件协议版本（信件字段 v，进入签名和 AAD）、口令封装版本（sealedKeys.v）。高于本页支持的一律拒绝并提示升级；低于的经 migrate() 逐级升级
 const migrate=d=>d; // 备份文件 schema 低于 DATA_SCHEMA 时在此逐级升级（目前为空）
 const ID_RE=/^id_[0-9a-f]{32}$/; // 灵宠 id 与信件 id 的统一格式
@@ -189,6 +188,7 @@ function normalize(d){ // 校验并规范化来自 HTML 的数据（初始数据
     const o={id:String(p.id).slice(0,100),nickname:String(p.nickname||'').slice(0,30),about:String(p.about||'').slice(0,200),remark:String(p.remark||'').slice(0,30),group:p.group==='member'||p.group==='verified'?p.group:'friend',relayUrl:String(p.relayUrl||'').slice(0,100),encPub:p.encPub,signPub:p.signPub};
     if(ok){o.encPriv=p.encPriv;o.signPriv=p.signPriv}else if(validSealed(p.sealedKeys))o.sealedKeys=cleanSealed(p.sealedKeys);
     if(p.needsKeyBackup===1&&(o.encPriv||o.sealedKeys))o.needsKeyBackup=1;
+    if(p.dormant===1&&!o.encPriv&&!o.sealedKeys)o.dormant=1; // 休眠：已解除契约、无私钥，仍留在“我的灵宠”，导入灵枢后苏醒
     if(p.relay===1&&(o.encPriv||o.sealedKeys)&&rc<MAX_RELAY){o.relay=1;rc++} // 超出上限的按顺序关闭中转
     if(['member','friend','verified'].includes(p.allow)&&(o.encPriv||o.sealedKeys))o.allow=p.allow;
     return o;
@@ -199,7 +199,7 @@ function normalize(d){ // 校验并规范化来自 HTML 的数据（初始数据
   if(m.convNames&&typeof m.convNames==='object')for(const k of Object.keys(m.convNames).slice(0,2000)){const v=m.convNames[k];if(typeof v==='string'&&v.trim()&&k.length<=5000&&live.has(k))cn[k]=v.slice(0,30)} // 会话名称：只存本地
   const ids=new Set(letters.map(b=>b.id)),handoff={};for(const i of Object.keys(d.handoff&&typeof d.handoff==='object'?d.handoff:{}))if(ids.has(i))handoff[i]=cleanHandoff(d.handoff[i]);
   const reads={};for(const i of Object.keys(d.reads&&typeof d.reads==='object'?d.reads:{}))if(ids.has(i))reads[i]=cleanReads(d.reads[i]);
-  return{meta:{...m,convNames:cn,spaceName:String(m.spaceName||'灵宠空间').slice(0,40),autoClean:[7,30,90,180,365].includes(m.autoClean)?m.autoClean:undefined,lastBackup:/^\d{4}-\d{2}-\d{2}T[\d:]{8}Z$/.test(m.lastBackup)?m.lastBackup:undefined,relayOn:Array.isArray(m.relayOn)?m.relayOn.filter(x=>typeof x==='string'&&x.length<=100).slice(0,10):undefined,relayRes:m.relayRes&&typeof m.relayRes==='object'?Object.fromEntries(Object.entries(m.relayRes).slice(0,10).filter(([k,v])=>k.length<=100&&v&&(v.ok===0||v.ok===1)&&S(v.at,40)).map(([k,v])=>[k,{ok:v.ok,at:v.at}])):undefined},identities,letters,handoff,reads};
+  return{meta:{...m,convNames:cn,spaceName:String(m.spaceName||'灵宠空间').slice(0,40),autoClean:[3,30,365].includes(m.autoClean)?m.autoClean:365,lastBackup:/^\d{4}-\d{2}-\d{2}T[\d:]{8}Z$/.test(m.lastBackup)?m.lastBackup:undefined,relayOn:Array.isArray(m.relayOn)?m.relayOn.filter(x=>typeof x==='string'&&x.length<=100).slice(0,10):undefined,relayRes:m.relayRes&&typeof m.relayRes==='object'?Object.fromEntries(Object.entries(m.relayRes).slice(0,10).filter(([k,v])=>k.length<=100&&v&&(v.ok===0||v.ok===1)&&S(v.at,40)).map(([k,v])=>[k,{ok:v.ok,at:v.at}])):undefined},identities,letters,handoff,reads};
 }
 let state=normalize(initial);
 state.meta.version=VERSION;
@@ -260,7 +260,7 @@ async function busy(btn,task){
 const letterFileName=async b=>{let t='';try{if(readerOf(b))t=b.kind==='text'?(await textOf(b)).slice(0,2000):String((await metaOf(b)).filename||'')}catch{}
   const a=[...t.replace(/[\p{P}\p{S}\p{C}\s]/gu,'')].slice(0,7);while(a.length<7)a.push('_');
   return `信件_${a.map((c,i)=>i%2?'_':c).join('')}_${b.id.slice(3,7)}.txt`}; // 文件名：正文（附件取文件名）前 7 个非标点字符的第 1、3、5、7 位，第 2、4、6 位用“_”占位，不足用“_”补
-const identityData=(p,withSecrets)=>({id:p.id,nickname:p.nickname,about:p.about||'',...(withSecrets?{remark:p.remark||'',group:p.group==='member'||p.group==='verified'?p.group:'friend'}:{}),relayUrl:p.relayUrl||'',encPub:p.encPub,signPub:p.signPub,...(withSecrets&&p.encPriv?{encPriv:p.encPriv,signPriv:p.signPriv}:{}),...(withSecrets&&p.sealedKeys?{sealedKeys:p.sealedKeys}:{}),...(withSecrets&&p.needsKeyBackup?{needsKeyBackup:1}:{}),...(withSecrets&&p.relay?{relay:1}:{}),...(withSecrets&&p.allow?{allow:p.allow}:{})});
+const identityData=(p,withSecrets)=>({id:p.id,nickname:p.nickname,about:p.about||'',...(withSecrets?{remark:p.remark||'',group:p.group==='member'||p.group==='verified'?p.group:'friend'}:{}),relayUrl:p.relayUrl||'',encPub:p.encPub,signPub:p.signPub,...(withSecrets&&p.encPriv?{encPriv:p.encPriv,signPriv:p.signPriv}:{}),...(withSecrets&&p.sealedKeys?{sealedKeys:p.sealedKeys}:{}),...(withSecrets&&p.needsKeyBackup?{needsKeyBackup:1}:{}),...(withSecrets&&p.dormant&&!p.encPriv&&!p.sealedKeys?{dormant:1}:{}),...(withSecrets&&p.relay?{relay:1}:{}),...(withSecrets&&p.allow?{allow:p.allow}:{})});
 
 /* ---------- crypto ---------- */
 const XK={name:'X25519'},Z12=new Uint8Array(12); // Z12：包装密钥的固定 IV，仅因 KEK 每封信、每个收件人都唯一（临时密钥 + 盐）才安全，切勿复用 KEK
@@ -287,6 +287,7 @@ async function encrypt(bytes,aad){
 /* ---------- 灵枢口令保护（可选）：PBKDF2-SHA256 → AES-GCM 加密两个私钥 ---------- */
 const KDF_ITER=600000;
 const isOwned=p=>!!(p.encPriv||p.sealedKeys);
+const mineOf=p=>isOwned(p)||!!p.dormant; // 属于“我的灵宠”：持有灵枢，或已休眠（解除契约后等待导入灵枢苏醒）
 const isUnlocked=p=>!!(p.encPriv||(p.sealedKeys&&encKeyCache[p.encPub]&&signKeyCache[p.encPub])); // 持有可用契约：明文契约，或已加口令且本次会话已解锁
 const sealAad=pub=>new TextEncoder().encode('spirit-pet-space/seal/v2\n'+pub); // 绑定公钥，防止加密块被换到别的灵宠上
 const sealKey=async(pw,salt,iter)=>crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},await crypto.subtle.importKey('raw',new TextEncoder().encode(String(pw).normalize('NFC')),'PBKDF2',false,['deriveKey']),{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
@@ -317,7 +318,7 @@ function lockIdentity(p){delete encKeyCache[p.encPub];delete signKeyCache[p.encP
 const pwToggle='<label class="key-check"><input type="checkbox" class="pwShow"> 显示口令</label>';
 function bindPwShow(){const c=document.querySelector('#dlg .pwShow');if(c)c.onchange=()=>document.querySelectorAll('#dlg input[data-pw]').forEach(i=>{i.type=c.checked?'text':'password'})}
 const tagBase=p=>p.encPriv?'<span class="tag">契约</span>':p.sealedKeys?(isUnlocked(p)?'<span class="tag" title="已解锁">契约🔓</span>':'<span class="tag" style="background:var(--warn)" title="已锁定">契约🔒</span>'):'';
-const tagOf=p=>tagBase(p)+(isOwned(p)?(p.relay?(isUnlocked(p)?(busyOf(p)?'<span class="tag" style="background:var(--warn)" title="中转站对该灵宠限流，稍后自动恢复">中转·忙</span>':'<span class="tag">中转</span>'):'<span class="tag" style="background:var(--warn)" title="已启用中转，但未解锁，暂不收信">中转·锁</span>'):'<span class="tag" style="background:var(--muted)">中转·关</span>'):'')+(p.needsKeyBackup?'<span class="tag" style="background:var(--danger)" title="灵枢未确认备份">!</span>':'')+(!isOwned(p)&&p.group==='member'?'<span class="tag" style="background:var(--muted)">群友</span>':'');
+const tagOf=p=>tagBase(p)+(isOwned(p)?(p.relay?(isUnlocked(p)?(busyOf(p)?'<span class="tag" style="background:var(--warn)" title="中转站对该灵宠限流，稍后自动恢复">中转·忙</span>':'<span class="tag">中转</span>'):'<span class="tag" style="background:var(--warn)" title="已启用中转，但未解锁，暂不收信">中转·锁</span>'):'<span class="tag" style="background:var(--muted)">中转·关</span>'):'')+(p.needsKeyBackup?'<span class="tag" style="background:var(--danger)" title="灵枢未确认备份">!</span>':'')+(p.dormant?'<span class="tag" style="background:var(--muted)" title="已解除契约，导入灵枢后苏醒">休眠</span>':'')+(!mineOf(p)&&p.group==='member'?'<span class="tag" style="background:var(--muted)">群友</span>':'');
 const actsOf=p=>p.sealedKeys?(isUnlocked(p)?'<button data-a="lock">锁定</button>':'<button class="primary" data-a="unlock">解锁</button>')+'<button data-a="pw">口令</button>':(p.encPriv?'<button data-a="pw">设口令</button>':'');
 const readerOf=b=>state.identities.find(p=>isUnlocked(p)&&b.recipientKeys.includes(p.encPub));
 async function decryptLetter(b){
@@ -485,7 +486,7 @@ async function imgDlg(title,kind,obj,name,payload,onShared){ // 图片预览窗�
     $('iSave').onclick=()=>dl(name,png,'image/png');$('iBack').onclick=back;
   },true);
 }
-const identityDlg=p=>rawModal([identityData(p,false)],`名片_${safeName(p.nickname)}.txt`,'名片·操作','名片可发给联系人。'+bulletinHint(),n=>imgDlg('名片图片','card',p,`${n}.png`,identityData(p,false)),'名片图片',null,false,isOwned(p)?()=>editDlg(p):null,[{t:'备注',f:()=>remarkDlg(p)},...(!isOwned(p)&&RELAYS.length?[{t:'住地',f:()=>relayDlg(p)}]:[]),...(isUnlocked(p)?[{t:'换新名片',f:()=>migDlg(p)}]:[])]);
+const identityDlg=p=>rawModal([{...identityData(p,false),relayUrl:''}],`名片_${safeName(p.nickname)}.txt`,'名片·操作','名片可发给联系人。'+bulletinHint(),(n,h)=>imgDlg('名片图片','card',h?p:{...p,relayUrl:''},`${n}.png`,{...identityData(p,false),relayUrl:h?(p.relayUrl||''):''}),'名片图片',null,false,isOwned(p)?()=>editDlg(p):null,[{t:'备注',f:()=>remarkDlg(p)},...(!isOwned(p)&&RELAYS.length?[{t:'住地',f:()=>relayDlg(p)}]:[]),...(isUnlocked(p)?[{t:'换新名片',f:()=>migDlg(p)}]:[])],h=>[{...identityData(p,false),relayUrl:h?(p.relayUrl||''):''}]);
 // 可选签名：每只灵宠另有一对独立的 Ed25519 签名密钥（与加密用的 X25519 密钥分离）
 const ECK={name:'Ed25519'},ECS=ECK; // 签名：Ed25519
 const impVerify=b64=>crypto.subtle.importKey('raw',b642ab(b64),ECK,false,['verify']);
@@ -550,10 +551,10 @@ async function copy(s){if(s.length>COPY_MAX){alert('内容过长，请改用导�
   try{await navigator.clipboard.writeText(s);toast('已复制');return true}
   catch{push(`<h3>复制内容</h3><div class="hint">自动复制失败，请手动复制：</div><textarea id="fb" readonly></textarea><div class="dialog-actions"><button id="fbB">返回</button></div>`,()=>{$('fb').value=s;$('fb').select();$('fbB').onclick=back});return false}
 }
-function rawModal(arr,name,title,hint,img,imgLabel,onShared,warn,edit,extra){
-  const fmt=pr=>JSON.stringify(arr,null,pr?2:0);let s=fmt(false);const base0=name.replace(/\.txt$/,''); // 默认紧缩；导入时 JSON.parse 两种格式都能读
-  push(`<h3>${title||'原始数据'}</h3>${hint?`<div class="hint">${hint}</div>`:''}<div class="warn-line" id="rWarn" style="display:none;margin:0 0 8px"></div><div class="content-box" id="rBox" style="max-height:300px;overflow:auto"></div>
-    <div class="hint">文件名可修改（自动加 .txt），图片沿用同名。</div><div class="mrow"><div style="flex:1;min-width:0;overflow:hidden"><input type="text" id="rName" maxlength="80" aria-label="文件名"></div><span class="sub" style="flex-shrink:0;margin-left:-4px">.txt</span><label class="key-check"><input type="checkbox" id="rPre"> 美化</label></div>
+function rawModal(arr,name,title,hint,img,imgLabel,onShared,warn,edit,extra,hab){let H=false; // hab：名片类弹窗传入 on=>数组；“含住地”默认不勾，住地清空
+  const fmt=pr=>JSON.stringify(hab?hab(H):arr,null,pr?2:0);let s=fmt(false);const base0=name.replace(/\.txt$/,''); // 默认紧缩；导入时 JSON.parse 两种格式都能读
+  push(`<h3>${title||'原始数据'}</h3>${hint?`<div class="hint">${hint}</div>`:''}<div class="warn-line" id="rWarn" style="display:none;margin:0 0 8px"></div><div class="row" style="justify-content:flex-end;gap:14px;margin:0 0 4px">${hab?'<label class="key-check" id="rHabL"><input type="checkbox" id="rHab"> 含住地</label>':''}<label class="key-check"><input type="checkbox" id="rPre"> 美化</label></div><div class="content-box" id="rBox" style="max-height:300px;overflow:auto"></div>
+    <div class="hint">文件名可修改（自动加 .txt），图片沿用同名。</div><div class="mrow"><div style="flex:1;min-width:0;overflow:hidden"><input type="text" id="rName" maxlength="80" aria-label="文件名"></div><span class="sub" style="flex-shrink:0;margin-left:-4px">.txt</span></div>
     <div class="dialog-actions"><button class="primary" id="rCopy">复制</button><button class="primary" id="rShare" style="display:none">分享(txt)</button><button id="rBack">返回</button></div><details class="more"><summary>更多方式</summary><div class="row bar"><button id="rExp">导出</button>${img?`<button id="rImg">${imgLabel||'导出图片'}</button>`:''}${edit?'<button id="rEdit">编辑</button>':''}${(extra||[]).map((x,i)=>`<button id="rX${i}">${x.t}</button>`).join('')}</div></details>`,()=>{
     const fn=()=>safeName($('rName').value).replace(/\.(txt|png|pdf)$/i,'').slice(0,80)||base0,show=()=>{$('rBox').textContent=s.length>20000?s.slice(0,20000)+'\n…（数据较大，仅显示前一部分，完整内容请导出）':s;wireShare($('rShare'),s,fn()+'.txt','text/plain',onShared);
       const w=$('rWarn'),big=s.length>COPY_MAX;$('rCopy').disabled=big; // 过长时停用复制：部分系统会截断剪贴板内容
@@ -561,8 +562,8 @@ function rawModal(arr,name,title,hint,img,imgLabel,onShared,warn,edit,extra){
       else if(warn&&s.length>LONG_JSON){w.style.display='';w.innerHTML=`内容较长（约 ${s.length} 字符），建议使用“分享(txt)”或“导出”`}
       else w.style.display='none'};
     
-    $('rName').value=base0;$('rName').onchange=()=>{$('rName').value=fn();show()};$('rPre').onchange=()=>{s=fmt($('rPre').checked);show()};show();
-    $('rCopy').onclick=async()=>{if(await copy(s)&&onShared)onShared('copy')};if(img)$('rImg').onclick=e=>busy(e.target,async()=>{await img(fn())});$('rExp').onclick=()=>dl(fn()+'.txt',s,'text/plain');$('rBack').onclick=back;if(edit)$('rEdit').onclick=edit;(extra||[]).forEach((x,i)=>{$('rX'+i).onclick=x.f});
+    $('rName').value=base0;$('rName').onchange=()=>{$('rName').value=fn();show()};const rb=()=>{s=fmt($('rPre').checked);show()};$('rPre').onchange=rb;if(hab){const hc=$('rHab');if(JSON.stringify(hab(true))===JSON.stringify(hab(false))){hc.disabled=true;$('rHabL').title='没有可包含的住地'}hc.onchange=()=>{H=hc.checked;rb()}}show();
+    $('rCopy').onclick=async()=>{if(await copy(s)&&onShared)onShared('copy')};if(img)$('rImg').onclick=e=>busy(e.target,async()=>{await img(fn(),H)});$('rExp').onclick=()=>dl(fn()+'.txt',s,'text/plain');$('rBack').onclick=back;if(edit)$('rEdit').onclick=edit;(extra||[]).forEach((x,i)=>{$('rX'+i).onclick=x.f});
   });
 }
 // 通用导入框：粘贴 / 导入文件 两个标签；handler 返回结果提示文字
@@ -591,15 +592,15 @@ function importDlg(title,hint,handler,jsonOnly,startTab,after){
 /* ---------- 渲染 ---------- */
 const openIds=new Set(),DRAFTS=Object.create(null); // DRAFTS：各会话未交付的草稿，仅内存
 let TAB='chat';const STEP=30,PAGE={chat:STEP,mine:STEP,friend:STEP,member:STEP},Q={chat:'',ident:''};
-const inTab=(p,t)=>t==='mine'?isOwned(p):!isOwned(p)&&(t==='member'?p.group==='member':true);
+const inTab=(p,t)=>t==='mine'?mineOf(p):!mineOf(p)&&(t==='member'?p.group==='member':true);
 const identitiesOf=t=>state.identities.filter(p=>inTab(p,t));
 function renderTabs(){
   const nw=state.letters.some(b=>{const e=state.reads[b.id];return e&&e.n});document.title=(nw?'● ':'')+(state.meta.spaceName||'灵宠空间');
-  const n={chat:(M=>convs().filter(c=>c.parts.some(k=>M.has(k))).length)(myKeys()),mine:identitiesOf('mine').length,friend:identitiesOf('friend').length,member:identitiesOf('member').length},L={chat:'会话',mine:'我的灵宠',friend:'好友/群友'};
+  const n={chat:(M=>convs().filter(c=>c.parts.some(k=>M.has(k))).length)(myKeys()),mine:identitiesOf('mine').length,friend:identitiesOf('friend').length,member:identitiesOf('member').length},L={chat:'会话',mine:'我的灵宠',friend:'好友'};
   document.querySelectorAll('.ptab').forEach(b=>{b.innerHTML=esc(`${L[b.dataset.p]}（${n[b.dataset.p]}）`)+(b.dataset.p==='chat'&&nw?'<i class="dot"></i>':'');b.classList.toggle('on',b.dataset.p===TAB)});
   const c=TAB==='chat';$('panelChat').style.display=c?'':'none';$('panelIdentities').style.display=c?'none':'';
-  $('idTitle').textContent={mine:'我的灵宠',friend:'好友 / 群友'}[TAB]||'';
-  $('idTip').textContent={mine:'已建立契约的灵宠，用于收发信件；启用中转后经住地中转站收发。',friend:'好友由你添加；群友来自群名片或群信，昵称和简介由对方提供。“核实·分组”可核对指纹并调整分组。'}[TAB]||'';
+  $('idTitle').textContent={mine:'我的灵宠',friend:'好友'}[TAB]||'';
+  $('idTip').textContent={mine:'已建立契约的灵宠，用于收发信件；启用中转后经住地中转站收发。解除契约的灵宠进入休眠，导入灵枢后苏醒。',friend:'好友分三组：好友v（已核对指纹）、好友、群友。好友由你添加；群友来自群名片或群信，昵称和简介由对方提供。“核实·分组”可核对指纹并调整分组。'}[TAB]||'';
   for(const id of['btnTame','btnContract'])$(id).style.display=TAB==='mine'?'':'none';
   $('btnAddFriend').style.display=TAB==='friend'?'':'none';$('btnAddMember').style.display=TAB==='friend'?'':'none';
   {const lk=state.identities.filter(p=>p.relay&&p.sealedKeys&&!isUnlocked(p)),lb=$('lockBar'); // 启用中转但未解锁：签不了名，无法收信也无法续座
@@ -609,15 +610,15 @@ function renderTabs(){
 const NCMP=new Intl.Collator(['zh-Hans-CN-u-co-pinyin','en'],{sensitivity:'base',numeric:true}),PYB='阿八嚓哒妸发旮哈讥咔垃妈拿噢妑七呥仨他哇夕丫匝',PYL='ABCDEFGHJKLMNOPQRSTWXYZ',ZH=new Intl.Collator('zh-Hans-CN-u-co-pinyin');
 const ini=s=>{const c=[...String(s||'').trim()][0]||'';if(/[a-z]/i.test(c))return c.toUpperCase();if(/\p{Script=Han}/u.test(c)){let r='A';for(let i=0;i<PYB.length;i++)if(ZH.compare(PYB[i],c)<=0)r=PYL[i];return r}return '#'}; // 首字母：英文取字母，中文按拼音首字母，其余归“#”排最前
 const NCMPF=(x,y)=>{const a=ini(x),b=ini(y);return a<b?-1:a>b?1:NCMP.compare(String(x||''),String(y||''))};
-const GR=p=>isOwned(p)?0:({verified:0,friend:1,member:2}[p.group]??1),GN={0:'已核实',1:'好友',2:'群友'}; // 列表分组：已核实 → 好友 → 群友，组内按昵称 A-Z（中文按拼音）；“我的灵宠”不分组
+const GR=p=>isOwned(p)?0:({verified:0,friend:1,member:2}[p.group]??1),GN={0:'好友v',1:'好友',2:'群友'}; // 列表分组：已核实 → 好友 → 群友，组内按昵称 A-Z（中文按拼音）；“我的灵宠”不分组
 function renderIdentities(){touch();renderTabs();
   if(TAB==='chat'){$('idList').innerHTML='';$('moreId').innerHTML='';return}
   const q=Q.ident.trim().toLowerCase(),all=identitiesOf(TAB).filter(p=>!q||[p.nickname,p.remark,p.about].some(s=>String(s||'').toLowerCase().includes(q))).sort((a,b)=>GR(a)-GR(b)||NCMPF(a.nickname,b.nickname)||NCMPF(a.remark,b.remark)),L=all.slice(0,PAGE[TAB]);
   let lastG=-1;const GC={};all.forEach(p=>{const g=GR(p);GC[g]=(GC[g]||0)+1});$('idList').innerHTML=L.map(p=>{const id=esc(p.id),o=openIds.has(p.id),g=GR(p),hd=TAB!=='mine'&&g!==lastG?`<div class="grp">${GN[g]}（${GC[g]}）</div>`:'';lastG=g;return hd+`<div class="card ident${o?' open':''}" data-id="${id}">
     <div class="ph" data-a="tog"><b>${esc(p.nickname)}${p.remark?` <span class="sub">${esc(p.remark)}</span>`:''}</b>${TAB==='mine'?tagOf(p):''}<span class="arr">▾</span></div>
-    <div class="pbody"><div class="sub" style="margin-top:6px">${p.about?esc(p.about):'（无简介）'}</div>
+    <div class="pbody"><div class="sub" style="margin-top:6px">${p.about?esc(p.about):'（无简介）'}</div>${p.dormant?'<div class="sub" style="color:var(--warn)">休眠中：点上方“导入灵枢”选择该灵宠的灵枢文件即可苏醒</div>':''}
     <div class="sub mono">指纹 ${esc(fullId(p.id))}</div>${p.relayUrl?`<div class="sub">住地 <span class="mono" style="word-break:break-all">${esc(p.relayUrl)}</span></div>`:''}
-    <div class="card-actions">${isOwned(p)?'':'<button data-a="dm">写信</button>'}<button data-a="raw">名片·操作</button>${!isOwned(p)?'<button data-a="vfy">核实·分组</button>':''}${actsOf(p)}${isOwned(p)?'<button data-a="exk">导出灵枢</button>'+(p.needsKeyBackup?'<button data-a="bkok" title="确认灵枢文件已备份" style="background:var(--danger);color:#fff;border-color:var(--danger)">已备份?</button>':''):''}${isOwned(p)?'<button data-a="unbind">解除契约</button>':''}<button data-a="del" class="danger-text">删除</button></div></div></div>`}).join('')
+    <div class="card-actions">${mineOf(p)?'':'<button data-a="dm">写信</button>'}<button data-a="raw">名片·操作</button>${!mineOf(p)?'<button data-a="vfy">核实·分组</button>':''}${actsOf(p)}${isOwned(p)?'<button data-a="exk">导出灵枢</button>'+(p.needsKeyBackup?'<button data-a="bkok" title="确认灵枢文件已备份" style="background:var(--danger);color:#fff;border-color:var(--danger)">已备份?</button>':''):''}${isOwned(p)?'<button data-a="unbind">解除契约</button>':''}<button data-a="del" class="danger-text">删除</button></div></div></div>`}).join('')
     ||`<div class="sub">${q?'没有匹配的灵宠':{mine:'暂无灵宠',friend:'暂无联系人'}[TAB]}</div>`;
   $('moreId').innerHTML=all.length>L.length?`<button id="btnMoreI">显示更多（还有 ${all.length-L.length} 个）</button>`:'';
   const mb=$('btnMoreI');if(mb)mb.onclick=()=>{PAGE[TAB]+=STEP;renderIdentities()};
@@ -704,7 +705,7 @@ function editDlg(p){ // 已建立契约的灵宠可修改昵称和自我介绍
     <label>昵称</label><input type="text" id="edNick" maxlength="30"><label>自我介绍（可空）</label><textarea id="edAbout" maxlength="200"></textarea>${RELAYS.length?`<label>住地（可空）</label><select id="edHab"><option value="">（无）</option>${RELAYS.map(r=>`<option>${esc(r)}</option>`).join('')}</select><label class="key-check"><input type="checkbox" id="edRelay"> 启用中转站</label><div class="row" style="margin-top:4px"><button type="button" class="rl" id="edQuota">检测额度</button></div><label>允许谁向我投信</label><select id="edAllow">${Object.keys(SCOPES).map(x=>`<option value="${x}">${SCOPES[x]}</option>`).join('')}</select>`:''}
     <div class="dialog-actions"><button class="primary" id="edGo">保存</button><button id="edBack">取消</button></div>`,()=>{
     $('edNick').value=p.nickname;$('edAbout').value=p.about||'';if($('edHab'))$('edHab').value=relayOf(p.relayUrl);if($('edAllow'))$('edAllow').value=p.allow||'friend';if($('edRelay'))$('edRelay').checked=!!p.relay;if($('edQuota'))$('edQuota').onclick=e=>busy(e.target,()=>quotaCheck(p,$('edHab').value));$('edBack').onclick=back;
-    $('edGo').onclick=()=>{const n=$('edNick').value.trim().slice(0,30);if(!n)return alert('昵称不能为空');if($('edRelay')&&$('edRelay').checked&&!$('edHab').value)return alert('启用中转需先选择住地');if($('edRelay')&&$('edRelay').checked&&!p.relay&&relayN()>=MAX_RELAY)return alert(`最多同时启用 ${MAX_RELAY} 只灵宠的中转。请先在其他灵宠上关闭中转。`);p.nickname=n;p.about=$('edAbout').value.trim().slice(0,200);if($('edHab'))p.relayUrl=$('edHab').value;if($('edAllow'))p.allow=$('edAllow').value;if($('edRelay')){if($('edRelay').checked)p.relay=1;else delete p.relay}renderIdentities();closeAll();if(p.relay){if(relayOn(relayOf(p.relayUrl)))relayPull(false);else toast('中转配置中未允许该中转站')}identityDlg(p)};
+    $('edGo').onclick=()=>{const n=$('edNick').value.trim().slice(0,30);if(!n)return alert('昵称不能为空');if($('edRelay')&&$('edRelay').checked&&!$('edHab').value)return alert('启用中转需先选择住地');if($('edRelay')&&$('edRelay').checked&&!p.relay&&relayN()>=MAX_RELAY)return alert(`最多同时启用 ${MAX_RELAY} 只灵宠的中转。请先在其他灵宠上关闭中转。`);const oR=relayOf(p.relayUrl),was=!!p.relay;p.nickname=n;p.about=$('edAbout').value.trim().slice(0,200);if($('edHab'))p.relayUrl=$('edHab').value;if($('edAllow'))p.allow=$('edAllow').value;if($('edRelay')){if($('edRelay').checked)p.relay=1;else delete p.relay}if(oR&&was&&(!p.relay||relayOf(p.relayUrl)!==oR))relayLeave(p,oR);renderIdentities();closeAll();if(p.relay){if(relayOn(relayOf(p.relayUrl)))relayPull(false);else toast('中转配置中未允许该中转站')}identityDlg(p)};
   });
 }
 function remarkDlg(p){
@@ -754,9 +755,9 @@ function dropLetters(ids){state.letters=state.letters.filter(b=>!ids.has(b.id));
 function unbindDlg(p,del){ // 解除契约 / 删除灵宠：只有它能读的信件将无法解读，让用户选择保留（移到“无法解读的会话”）或删除
   const oth=new Set(state.identities.filter(q=>q!==p&&isOwned(q)).map(q=>q.encPub)),
     L=isOwned(p)?state.letters.filter(b=>b.recipientKeys.includes(p.encPub)&&!b.recipientKeys.some(k=>oth.has(k))):[],nc=new Set(L.map(b=>keyOf(partsOf(b)))).size,
-    fin=drop=>{if(drop)dropLetters(new Set(L.map(b=>b.id)));delete p.relay;delete p.allow;if(del)state.identities=state.identities.filter(x=>x!==p);else{delete p.encPriv;delete p.signPriv;delete p.sealedKeys;delete p.needsKeyBackup;p.group='friend'}delete encKeyCache[p.encPub];delete signKeyCache[p.encPub];renderAll();closeAll()};
-  if(!L.length){if(confirm(del?(isOwned(p)?'删除灵宠并清除其灵枢（未备份则无法找回）？':'确认删除此灵宠？'):'解除契约将清除私钥（未备份则无法找回），灵宠转为好友并停用中转。确认？'))fin(false);return}
-  push(`<h3>${del?'删除灵宠':'解除契约'}</h3><div class="warn-strong">私钥将被清除，未备份则无法找回。${del?'':'灵宠将转为好友并停用中转。'}</div>
+    fin=drop=>{if(p.relay)relayLeave(p,relayOf(p.relayUrl));if(drop)dropLetters(new Set(L.map(b=>b.id)));delete p.relay;delete p.allow;if(del)state.identities=state.identities.filter(x=>x!==p);else{delete p.encPriv;delete p.signPriv;delete p.sealedKeys;delete p.needsKeyBackup;p.dormant=1}delete encKeyCache[p.encPub];delete signKeyCache[p.encPub];renderAll();closeAll()};
+  if(!L.length){if(confirm(del?(isOwned(p)?'删除灵宠并清除其灵枢（未备份则无法找回）？':'确认删除此灵宠？'):'解除契约将清除私钥（未备份则无法找回），灵宠进入休眠并停用中转；导入灵枢后苏醒。确认？'))fin(false);return}
+  push(`<h3>${del?'删除灵宠':'解除契约'}</h3><div class="warn-strong">私钥将被清除，未备份则无法找回。${del?'':'灵宠将进入休眠并停用中转。'}</div>
     <div style="font-size:13px">仅「${esc(p.nickname)}」可解读的信件共 ${L.length} 封（${nc} 个会话），之后将无法解读。</div>
     <div class="hint keep" style="margin-top:8px">保留：会话移入“无法解读的会话”，重新导入灵枢后恢复。</div>
     <div class="dialog-actions"><button class="primary" id="ubKeep">保留这些信件</button><button class="danger-text" id="ubDel">同时删除这些信件</button><button id="ubBack">取消</button></div>`,()=>{
@@ -800,14 +801,14 @@ async function addIdentities(data,withSecrets,defGroup,local){ // defGroup：新
       if(withSecrets&&!sealed&&(!d.encPriv||typeof d.encPriv!=='object'||!d.signPriv||typeof d.signPriv!=='object'||!await checkPair(d.encPub,d.encPriv)||!await checkSign(d.signPub,d.signPriv)))throw 0;
       const byId=state.identities.find(x=>x.id===d.id),byKey=state.identities.find(x=>x.encPub===d.encPub);
       if(byKey&&byKey!==byId)throw 'cf';
-      let p=byId;if(p&&!withSecrets&&isOwned(p))throw 'own';
-      const want=local&&(d.group==='member'||d.group==='friend'||d.group==='verified')?d.group:(defGroup||'friend'); // 按添加时选的分类（好友/群友）；已有灵宠只会被移到好友列表，不会被降为群友
+      let p=byId;if(p&&!withSecrets&&(isOwned(p)||(p.dormant&&!local)))throw 'own';
+      const want=local&&(d.group==='member'||d.group==='friend'||d.group==='verified')?d.group:(defGroup||'friend'); // 按添加时选的分类（好友）；已有灵宠只会被移到好友列表，不会被降为群友
       if(!p){if(state.identities.length>=MAX_IDENTITIES)throw 'full';p={id:d.id,remark:'',group:want};state.identities.push(p);add++}else{ow++;if(local)p.group=want;else if(want==='friend'&&p.group==='member')p.group='friend'}
       p.nickname=String(d.nickname||'未命名灵宠').slice(0,30);p.about=String(d.about||'').slice(0,200);if(d.relayUrl||withSecrets||local||!p.relayUrl)p.relayUrl=String(d.relayUrl||'').slice(0,100); // 名片没写住地时，不覆盖本地已约定的住地
-      p.encPub=d.encPub;p.signPub=d.signPub;
+      p.encPub=d.encPub;p.signPub=d.signPub;if(!withSecrets&&local&&d.dormant&&!isOwned(p))p.dormant=1;
       if(d.remark&&(local||withSecrets))p.remark=String(d.remark).slice(0,30);
       if(withSecrets){
-        if(sealed){p.sealedKeys=cleanSealed(d.sealedKeys);delete p.encPriv;delete p.signPriv;nl++}
+        delete p.dormant;if(sealed){p.sealedKeys=cleanSealed(d.sealedKeys);delete p.encPriv;delete p.signPriv;nl++}
         else{p.encPriv=d.encPriv;p.signPriv=d.signPriv;delete p.sealedKeys}
         delete encKeyCache[p.encPub];delete signKeyCache[p.encPub];key++;if(local&&d.needsKeyBackup)p.needsKeyBackup=1;else delete p.needsKeyBackup;
         if(local&&d.relay&&(p.relay||relayN()<MAX_RELAY))p.relay=1;else{if(local&&d.relay)cap++;delete p.relay}
@@ -841,14 +842,14 @@ function migDlg(p){
     $('mgGo').onclick=e=>busy(e.target,async()=>{
       const np=state.identities.find(q=>q.id===$('mgTo').value),m={kind:'migration',v:1,old:{id:p.id,encPub:p.encPub,signPub:p.signPub},new:identityData(np,false),timestamp:nowStamp()};
       const k=signKeyCache[p.encPub]||(signKeyCache[p.encPub]=await impSign(p.signPriv));m.sig=ab2b64(await crypto.subtle.sign(ECS,k,sigMig(m)));
-      back();rawModal([m],`换新名片_${safeName(p.nickname)}.txt`,'换新名片','发给联系人，对方在“好友/群友”页签导入。',null,null,null,true);
+      back();rawModal([m],`换新名片_${safeName(p.nickname)}.txt`,'换新名片','发给联系人，对方在“好友”页签导入。',null,null,null,true);
     });
   });
 }
 function vfyDlg(p){ // 核实·分组：可指定分组（已核实 / 好友 / 群友），也可降级
-  push(`<h3>核实 / 分组：${esc(p.nickname)}</h3><div class="hint keep">通过名片以外的渠道（当面、电话、视频）与对方逐组核对指纹；一致则可归入「已核实」。</div>
+  push(`<h3>核实 / 分组：${esc(p.nickname)}</h3><div class="hint keep">通过名片以外的渠道（当面、电话、视频）与对方逐组核对指纹；一致则可归入「好友v」。</div>
     <div class="content-box mono" style="font-size:15px;letter-spacing:1px">${esc(fullId(p.id))}</div>
-    <label>分组</label><select id="vGrp"><option value="verified">已核实（昵称后带 v）</option><option value="friend">好友</option><option value="member">群友</option></select>
+    <label>分组</label><select id="vGrp"><option value="verified">好友v（已核实，昵称后带 v）</option><option value="friend">好友</option><option value="member">群友</option></select>
     <div class="dialog-actions"><button class="primary" id="vOk">保存</button><button id="vBack">取消</button></div>`,()=>{
     const s=$('vGrp');s.value=p.group==='verified'||p.group==='member'?p.group:'friend';$('vBack').onclick=back;
     $('vOk').onclick=()=>{p.group=s.value;renderAll();closeAll()};
@@ -914,7 +915,7 @@ function newChatDlg(pre){ // pre：要写信的对象的公钥
   if(pre&&my.length===1)return chatDlg([pre,my[0].encPub].sort()); // 只有一只可用灵宠：直接进入一对一会话
   push(`<h3>写信</h3><div class="hint">选择收信人（可多选）；不选则会话仅含自己。</div>
     ${my.length>1?'<label>发信人</label>':''}<select id="nSender"${my.length>1?'':' style="display:none"'}>${my.map(p=>`<option value="${esc(p.id)}">${esc(p.nickname)}</option>`).join('')}</select>
-    <details class="more" style="margin-top:8px"><summary id="nSum"></summary>${nm?`<label class="key-check"><input type="checkbox" id="nShowM"> 显示群友（${nm}）</label>`:''}<div id="nKeys">${state.identities.map(p=>{const m=inTab(p,'member');return `<label class="key-check${m?' mem':''}"${m?' style="display:none"':''}><input type="checkbox" value="${esc(p.encPub)}"> ${whoOf(p.encPub)}</label>`}).join('')}</div></details>
+    <details class="more" style="margin-top:8px"><summary id="nSum"></summary>${nm?`<label class="key-check"><input type="checkbox" id="nShowM"> 显示群友（${nm}）</label>`:''}<div id="nKeys">${state.identities.filter(p=>!p.dormant).map(p=>{const m=inTab(p,'member');return `<label class="key-check${m?' mem':''}"${m?' style="display:none"':''}><input type="checkbox" value="${esc(p.encPub)}"> ${whoOf(p.encPub)}</label>`}).join('')}</div></details>
     <div class="dialog-actions"><button class="primary" id="nGo">开始</button><button id="nBack">取消</button></div>`,()=>{
     $('nBack').onclick=back;
     const sum=()=>{const s=[...document.querySelectorAll('#nKeys input:checked:not(:disabled)')].map(i=>nameOf(i.value));$('nSum').textContent='对方：'+(s.length?(s.length>3?s.slice(0,3).join('、')+`等 ${s.length} 位`:s.join('、')):'无（只有自己）')};
@@ -988,8 +989,8 @@ function chatDlg(parts){
   },true);
 }
 function addMemberDlg(parts){ // 会话由参与者集合决定：加人 = 进入包含新成员的新会话（原会话成为它的子会话）；新成员读不到旧信
-  const rk=p=>isOwned(p)?2:p.group==='member'?1:0,cand=state.identities.filter(p=>!parts.includes(p.encPub)).sort((a,b)=>rk(a)-rk(b)); // 好友 → 群友 → 我的（己方灵宠也可加入，让它读到之后的信）
-  if(!cand.length)return alert('没有可添加的灵宠：请先在“好友/群友”页签添加');
+  const rk=p=>isOwned(p)?2:p.group==='member'?1:0,cand=state.identities.filter(p=>!parts.includes(p.encPub)&&!p.dormant).sort((a,b)=>rk(a)-rk(b)); // 好友 → 群友 → 我的（己方灵宠也可加入，让它读到之后的信）
+  if(!cand.length)return alert('没有可添加的灵宠：请先在“好友”页签添加');
   push(`<h3>添加成员</h3><div class="hint">新成员无法读取此前的信件；确定后进入含新成员的新会话，原会话保留。可添加自己的其他灵宠。</div><div id="amKeys">${cand.map(p=>`<label class="key-check"><input type="checkbox" value="${esc(p.encPub)}"> ${whoOf(p.encPub)}${isOwned(p)?' <span class="tag">我的</span>':p.group==='member'?' <span class="tag" style="background:var(--muted)">群友</span>':''}</label>`).join('')}</div>
     <div class="dialog-actions"><button class="primary" id="amGo">确定</button><button id="amBack">取消</button></div>`,()=>{
     $('amBack').onclick=back;
@@ -1018,18 +1019,18 @@ function relBox(parts){ // 关联会话：父 / 当前 / 子，默认折叠
   const row=(n,L)=>L.length?`<div class="sub" style="margin:4px 0">${n}：${L.slice(0,8).map(c=>`<button class="rl" data-k="${esc(c.k)}">${nm(c)}</button>`).join(' ')}${L.length>8?` 等 ${L.length} 个`:''}</div>`:'';
   return `<details class="more" id="cRel"><summary>关联会话（父 ${r.up.length} · 子 ${r.down.length}）</summary>${row('父会话（成员更多）',r.up)}<div class="sub" style="margin:4px 0">当前会话：<b>${esc(ell(convNameOf(parts),12))}（${parts.length}人）</b></div>${row('子会话（成员更少）',r.down)}</details>`;
 }
-function groupCard(parts){ // 把本会话里我已知的成员名片打成一个数组；对方用“添加群友灵宠”导入。没发过信的成员我这里没有签名公钥，无法包含
+function groupCard(parts){const mk=H=>{ // 把本会话里我已知的成员名片打成一个数组；对方用“添加群友灵宠”导入。没发过信的成员我这里没有签名公钥，无法包含
   const arr=[];
   for(const k of parts){
     const p=state.identities.find(x=>x.encPub===k);
-    if(p){arr.push(identityData(p,false));continue}
+    if(p){arr.push({...identityData(p,false),relayUrl:H?(p.relayUrl||''):''});continue}
     const b=state.letters.find(x=>x.sender.encPub===k&&x.sender.id),f=b&&b.sender;
-    if(f)arr.push({id:f.id,nickname:f.nickname,about:f.about||'',relayUrl:f.relayUrl||'',encPub:f.encPub,signPub:f.signPub});
+    if(f)arr.push({id:f.id,nickname:f.nickname,about:f.about||'',relayUrl:H?(f.relayUrl||''):'',encPub:f.encPub,signPub:f.signPub});
   }
-  const miss=parts.length-arr.length;
-  rawModal(arr,`群名片_${fileStamp()}.txt`,'群名片','发给群成员，对方通过“添加群友灵宠”导入。'+(miss?`<br>另有 ${miss} 位成员尚无名片（未发过信），未包含。`:''),null,null,null,true);
+  return arr};const arr0=mk(false),miss=parts.length-arr0.length;
+  rawModal(arr0,`群名片_${fileStamp()}.txt`,'群名片','发给群成员，对方通过“添加群友灵宠”导入。'+(miss?`<br>另有 ${miss} 位成员尚无名片（未发过信），未包含。`:''),null,null,null,true,null,null,mk);
 }
-let CUR=null,reading=false;const RRT=Object.create(null); // CUR：当前打开的会话窗口，收到新信时刷新
+let CUR=null,reading=false; // CUR：当前打开的会话窗口，收到新信时刷新
 function clearNew(parts){const key=keyOf(parts);let c=false;for(const b of state.letters){const e=state.reads[b.id];if(e&&e.n&&keyOf(partsOf(b))===key){delete e.n;c=true}}if(c)touch();return c}
 function refreshChat(){if(CUR&&CUR.tl.isConnected){clearNew(CUR.parts);CUR.paint(true);relayRead(CUR.parts)}}
 const rdMark=b=>{const e=state.reads[b.id];if(!e||!e.dl.length)return '';const M=myKeys(),tot=b.recipientKeys.filter(k=>!M.has(k)).length,y=e.dl.length,x=e.rd.filter(f=>e.dl.includes(f)).length; // 一对一：双对勾；多人：（中转已读/中转应读,全部收信人数）；仅统计中转站已接收的收信人
@@ -1041,11 +1042,11 @@ async function relayRead(parts){ // 已读回执：打开会话时，向寄信�
     if(M.has(b.sender.encPub)||keyOf(partsOf(b))!==key)continue;const e=state.reads[b.id];if(e&&e.s)continue; // s：旧版记录，视为已发完；新版用 sd 记录已发回执的灵宠 id
     const sp=idx().identities.get(b.sender.encPub),sfp=sp?sp.id:b.sender.id,sr=relayOf(sp?sp.relayUrl:b.sender.relayUrl),sent=new Set(e&&e.sd||[]);
     if(!sfp||!sr||!relayOn(sr)||!relayDue(sr))continue;
-    for(const rp of pets){if(busyOf(rp)||!b.recipientKeys.includes(rp.encPub)||sent.has(rp.id)||(RRT[b.id+rp.id]||0)>now)continue;const gk=sr+'|'+sfp+'|'+rp.id;if(!g.has(gk))g.set(gk,{sr,sfp,rp,ids:[]});g.get(gk).ids.push(b.id)}}
+    for(const rp of pets){if(busyOf(rp)||!b.recipientKeys.includes(rp.encPub)||sent.has(rp.id)||(ps(rp).rt[b.id]||0)>now)continue;const gk=sr+'|'+sfp+'|'+rp.id;if(!g.has(gk))g.set(gk,{sr,sfp,rp,ids:[]});g.get(gk).ids.push(b.id)}}
   if(!g.size)return;reading=true;
   try{for(const{sr,sfp,rp,ids}of g.values())for(let i=0;i<ids.length;i+=20){const c=ids.slice(i,i+20);if(busyOf(rp))break;
     try{const j=await relayCall(sr,'/v1/read',{to:sfp,ids:c,auth:await relayAuth(rp,'read',sfp+':'+c.join(','))});
-      if(j&&j.done){for(const id of c){const e=state.reads[id]||(state.reads[id]={dl:[],rd:[]});e.sd=[...new Set([...(e.sd||[]),rp.id])].slice(0,MAX)}touch()}else for(const id of c)RRT[id+rp.id]=Date.now()+6e5}
+      if(j&&j.done){for(const id of c){const e=state.reads[id]||(state.reads[id]={dl:[],rd:[]});e.sd=[...new Set([...(e.sd||[]),rp.id])].slice(0,MAX)}touch()}else for(const id of c)ps(rp).rt[id]=Date.now()+6e5}
     catch(e){noteBusy(rp,e)}}}
   finally{reading=false}}
 const senderName=b=>{const p=state.identities.find(x=>x.encPub===b.sender.encPub);return p?(p.remark||p.nickname)+(p.group==='verified'&&!isOwned(p)?' v':''):b.sender.nickname}; // 本地已有的灵宠用本地名称；信里自报的昵称不可信
@@ -1086,10 +1087,10 @@ function seedRelay(){for(const r of RELAYS){const x=(state.meta.relayRes||{})[r]
 async function relayCheck(r){const t0=Date.now();try{const j=await relayCall(r,'/v1/check',undefined,8000);relayMark(r,!!(j&&j.ok===1&&j.do===true),Date.now()-t0,true)}catch{relayMark(r,false,null,true)}} // HTTPS 请求探测
 const SIG=r=>{const s=RS[r];if(!s||s.ok===undefined)return '<span style="color:var(--muted)" title="未测试">●</span>';const t=s.at?fmtT(s.at):'';return s.ok?`<span style="color:var(--accent)" title="成功 ${t}${s.ms?' · '+s.ms+'ms':''}">●</span>`:`<span style="color:var(--danger)" title="失败 ${t}">●</span>`};
 function renderRelay(){const e=$('netBox');if(!e)return;e.style.display='';
-  $('netBody').innerHTML=(RELAYS.map((r,i)=>`<div class="row" style="flex-wrap:nowrap;gap:6px;margin:4px 0"><input type="checkbox" data-s="${i}"${relayOn(r)?' checked':''} aria-label="允许"><span class="mono" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${esc(r)}">${esc(r.replace(/^https:\/\//,''))}</span><span style="flex-shrink:0">${SIG(r)}</span><button class="rl" data-r="${i}">测试</button></div>`).join('')||'<div class="sub">尚未配置中转站，页面不联网。</div>')+'<div class="row" style="margin-top:6px"><button class="rl" id="btnWl">编辑白名单</button></div>';
-  document.querySelectorAll('#netBody [data-s]').forEach(c=>c.onchange=()=>{const r=RELAYS[+c.dataset.s],on=new Set(state.meta.relayOn||[]);if(c.checked)on.add(r);else on.delete(r);state.meta.relayOn=[...on];touch();for(const x in BLOCK)delete BLOCK[x];renderRelay();if(c.checked)relayPull(false)});
-  document.querySelectorAll('#netBody [data-r]').forEach(b=>b.onclick=()=>busy(b,()=>relayCheck(RELAYS[+b.dataset.r])));$('btnWl').onclick=wlDlg}
-const junk=async x=>{if(Number.isInteger(x.v)&&x.v>LETTER_V)return false;if(!validLetter(x)||!x.recipientKeys.some(k=>myKeys().has(k)))return true;return !await verifyLetter(cleanLetter(x))}; // 垃圾信：格式不对、收件人里没有我、验签失败；收下后确认删除，避免堵住信箱
+  $('netBody').innerHTML=(RELAYS.map((r,i)=>`<div class="row" style="flex-wrap:nowrap;gap:6px;margin:4px 0"><input type="checkbox" data-s="${i}"${relayOn(r)?' checked':''} aria-label="允许"><span class="mono" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${esc(r)}">${esc(r.replace(/^https:\/\//,''))}</span><span style="flex-shrink:0">${SIG(r)}</span><button class="rl" data-r="${i}">测试</button></div>`).join('')||'<div class="sub">尚未配置中转站，页面不联网（在“导出模板”中配置）。</div>');
+  document.querySelectorAll('#netBody [data-s]').forEach(c=>c.onchange=()=>{const r=RELAYS[+c.dataset.s],on=new Set(state.meta.relayOn||[]);if(c.checked)on.add(r);else on.delete(r);state.meta.relayOn=[...on];touch();for(const x in PS)PS[x].block=0;renderRelay();if(c.checked)relayPull(false)});
+  document.querySelectorAll('#netBody [data-r]').forEach(b=>b.onclick=()=>busy(b,()=>relayCheck(RELAYS[+b.dataset.r])))}
+const junk=async(x,M)=>!validLetter(x)||!x.recipientKeys.some(k=>M.has(k))||!await verifyLetter(cleanLetter(x)); // 垃圾信：格式不对、收件人里没有我、验签失败；收下后确认删除。版本过新的信由取信处一并清出（不会被收进空间，留着只会占满信箱、挡住后面的新信）
 async function relayCall(url,path,body,ms){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms||20000);let r;
   try{r=await fetch(url+path,body===undefined?{signal:c.signal}:{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body),signal:c.signal})}
   catch(e){relayMark(url,false);throw Object.assign(new Error(e&&e.name==='AbortError'?'连接超时':'无法连接（网络拦截或 CSP 未放行）'),{net:true})}
@@ -1120,40 +1121,44 @@ async function relaySend(b){ // 返回 true = 所有对外收件人都已投递�
   if(ok===total){toast(`已投递 ${ok}/${total}`);return true}
   toast(`已投递 ${ok}/${total}${rej?`；${rej} 位未开通信箱或未允许你投信`:''}${fl?`；${fl} 位信箱已满`:''}${why.length?'；'+why.slice(0,2).join('；'):''}`);return false;
 }
-const BUSY={},busyOf=p=>(BUSY[p.id]||0)>Date.now(); // BUSY：被中转站限流的灵宠 -> 恢复时间（仅内存）
-function noteBusy(p,e){if(!e||!e.busy)return false;const was=busyOf(p),ms=Math.min(36e5,Math.max(30,e.retry||60)*1000)*(1+Math.random()*.2);BUSY[p.id]=Date.now()+ms;if(!was){toast('「'+p.nickname+'」中转繁忙，稍后自动恢复');renderIdentities()}setTimeout(()=>{if(!busyOf(p))renderIdentities()},ms+500);return true}
+const busyOf=p=>!!(PS[p.id]&&PS[p.id].busy>Date.now()); // 被中转站限流的灵宠
+function noteBusy(p,e){if(!e||!e.busy)return false;const was=busyOf(p),ms=Math.min(36e5,Math.max(30,e.retry||60)*1000)*(1+Math.random()*.2);ps(p).busy=Date.now()+ms;if(!was){toast('「'+p.nickname+'」中转繁忙，稍后自动恢复');renderIdentities()}setTimeout(()=>{if(!busyOf(p))renderIdentities()},ms+500);return true}
 const SEAT_RENEW_MS=4*36e5; // 座位剩余不足 4 小时才续期；须与中转站的 RENEW_LEFT_H 一致
-const SYNCED={},BLOCK={},SEAT={},ETAG={},RANK={verified:0,friend:1,member:2},SCOPES={member:'群友及以上（全部联系人）',friend:'好友及以上',verified:'仅已核实'}; // SEAT：座位到期时间；ETAG：上次取空时的信箱版本；NOTE：看板上的信箱状态
+const PS=Object.create(null),ps=(p,r)=>{const s=PS[p.id]||(PS[p.id]={r,key:'',seat:0,block:0,busy:0,rt:{}});if(r&&s.r!==r){if(s.r)Object.assign(s,{key:'',seat:0,block:0,rt:{}});s.r=r}return s},RANK={verified:0,friend:1,member:2},SCOPES={member:'好友v / 好友 / 群友（全部联系人）',friend:'好友v / 好友',verified:'仅好友v'}; // PS：每只灵宠的中转运行态（仅内存）：r 住地，key 已同步的允许名单，seat 座位到期，block 暂停同步到，busy 被限流到，rt 回执重试时间
 const allowList=p=>{const sc=RANK[p.allow]??1;return state.identities.filter(q=>q!==p&&(isOwned(q)||RANK[q.group]<=sc)).map(q=>q.id).slice(0,MAX_ALLOW)}; // 允许名单：我自己的灵宠 + 不低于所选分组的联系人
 async function relaySync(p,r){ // 占座并同步允许名单；座位临近到期（或已过期）自动续；没变化不重复上传
-  const l=allowList(p),key=l.join(','),k=r+p.id,same=SYNCED[k]===key;
-  if((BLOCK[k]||0)>Date.now())return;
-  if(same&&(SEAT[k]||0)-Date.now()>SEAT_RENEW_MS)return; // 座位剩余充足：不请求
-  try{const j=await relayCall(r,'/v1/box/allow',{list:l,renew:same,auth:await relayAuth(p,'allow',(same?1:0)+':'+key)});SYNCED[k]=key;SEAT[k]=j.exp||0;}
-  catch(e){if((e.status===429&&!e.busy)||e.status===503)BLOCK[k]=Date.now()+18e5;throw e}}
+  const l=allowList(p),key=l.join(','),s=ps(p,r),same=s.key===key;
+  if(s.block>Date.now())return;
+  if(same&&s.seat-Date.now()>SEAT_RENEW_MS)return; // 座位剩余充足：不请求
+  try{const j=await relayCall(r,'/v1/box/allow',{list:l,renew:same,auth:await relayAuth(p,'allow',(same?1:0)+':'+key)});s.key=key;s.seat=j.exp||0}
+  catch(e){if((e.status===429&&!e.busy)||e.status===503)s.block=Date.now()+18e5;throw e}}
+function relayLeave(p,r){ // 换住地 / 关中转 / 解除契约时通知原住地离座，免得别人还能向这个信箱投信；须已解锁才能签名，否则座位在不再活动后自动到期；箱里已有的信留到过期清理
+  delete PS[p.id];if(!r||!relayOn(r))return;
+  if(!isUnlocked(p)){toast('灵宠未解锁，无法通知原住地离座；座位将在不再活动后到期');return}
+  relayAuth(p,'leave','').then(a=>relayCall(r,'/v1/box/leave',{auth:a})).catch(()=>{}).finally(()=>{if(!isOwned(p))delete signKeyCache[p.encPub]});
+}
 let pulling=false,pollT=null,lastAct=Date.now(),RPOLL=0; // RPOLL：中转站建议的最短轮询间隔（秒），活跃灵宠多时自动拉长
-const ACKED=new Map(); // ACKED：刚确认删除的条目（KV 列表最终一致，删除后可能仍被列出，不重复处理）
 const pollGap=()=>document.hidden?0:((CUR&&CUR.tl.isConnected)||Date.now()-lastAct<12e4)?Math.max(8000,RPOLL*1e3):Math.max(30000,RPOLL*1e3); // 前台：打开会话或近 2 分钟有收发时 8 秒，否则 30 秒；后台不轮询
 function schedulePoll(){clearTimeout(pollT);const g=pollGap();if(g)pollT=setTimeout(()=>relayPull(false).finally(schedulePoll),g)}
 async function relayPull(manual){ // 对每只启用中转、已解锁、住地被允许的灵宠取信；导入成功的才确认删除。自动轮询遵守退避，手动收取不受限
-  if(pulling||!RELAYS.length)return 0;pulling=true;let n=0,err='',seatErr='',tried=0;
-  try{for(const p of state.identities.filter(q=>q.relay&&isUnlocked(q))){const r=relayOf(p.relayUrl),k=r+p.id;if(!relayOn(r)||(!manual&&!relayDue(r))||(!manual&&busyOf(p)))continue;tried++;
+  if(pulling||!RELAYS.length)return 0;pulling=true;let n=0,upg=0,err='',seatErr='',tried=0;
+  try{for(const p of state.identities.filter(q=>q.relay&&isUnlocked(q))){const r=relayOf(p.relayUrl);if(!relayOn(r)||(!manual&&!relayDue(r))||(!manual&&busyOf(p)))continue;tried++;
     try{try{await relaySync(p,r)}catch(e){if(e.net)throw e;if(noteBusy(p,e))continue;seatErr=e.message}for(let i=0;i<5;i++){
-      const res=await relayCall(r,'/v1/box/fetch',{since:ETAG[k]||0,auth:await relayAuth(p,'fetch',String(ETAG[k]||0))}),L=Array.isArray(res.letters)?res.letters:[],R=(Array.isArray(res.reads)?res.reads:[]).filter(x=>x&&typeof x.id==='string'&&ID_RE.test(x.id)&&typeof x.by==='string'&&ID_RE.test(x.by)).slice(0,40).map(x=>({id:x.id,by:x.by}));if(res.seat)SEAT[k]=res.seat;if(res.poll)RPOLL=Math.min(120,+res.poll||0);
-      const now=Date.now(),L2=L.filter(x=>x&&!(ACKED.get('l'+x.id)>now)),R2=R.filter(x=>!(ACKED.get('r'+x.by+x.id)>now));if(ACKED.size>500)for(const[a,v]of ACKED)if(v<now)ACKED.delete(a);
-      if(!L2.length&&!R2.length){ETAG[k]=res.etag||0;break}
-      if(R2.length){for(const x of R2){if(!state.letters.some(b=>b.id===x.id))continue;const e=state.reads[x.id]||(state.reads[x.id]={dl:[],rd:[]});if(!e.dl.includes(x.by))e.dl.push(x.by);if(!e.rd.includes(x.by))e.rd.push(x.by)}await relayCall(r,'/v1/box/rdack',{rd:R2,auth:await relayAuth(p,'rdack',R2.map(x=>x.by+':'+x.id).join(','))});R2.forEach(x=>ACKED.set('r'+x.by+x.id,now+3e5));renderCards();if(!L2.length){if(!res.more){ETAG[k]=res.etag||0;break}continue}}
+      const res=await relayCall(r,'/v1/box/fetch',{auth:await relayAuth(p,'fetch','0')}),L=Array.isArray(res.letters)?res.letters:[],R=(Array.isArray(res.reads)?res.reads:[]).filter(x=>x&&typeof x.id==='string'&&ID_RE.test(x.id)&&typeof x.by==='string'&&ID_RE.test(x.by)).slice(0,40).map(x=>({id:x.id,by:x.by}));if(res.seat)ps(p,r).seat=res.seat;if(res.poll)RPOLL=Math.min(120,+res.poll||0);
+      const L2=L.filter(x=>x&&typeof x==='object'),R2=R;
+      if(!L2.length&&!R2.length)break;
+      if(R2.length){for(const x of R2){if(!state.letters.some(b=>b.id===x.id))continue;const e=state.reads[x.id]||(state.reads[x.id]={dl:[],rd:[]});if(!e.dl.includes(x.by))e.dl.push(x.by);if(!e.rd.includes(x.by))e.rd.push(x.by)}await relayCall(r,'/v1/box/rdack',{rd:R2,auth:await relayAuth(p,'rdack',R2.map(x=>x.by+':'+x.id).join(','))});renderCards();if(!L2.length){if(!res.more)break;continue}}
       const before=state.letters.length;await addLetters(L2,true);n+=state.letters.length-before;
-      const have=new Set(state.letters.map(x=>x.id)),ids=[];for(const x of L2)if(typeof x.id==='string'&&ID_RE.test(x.id)&&(have.has(x.id)||await junk(x)))ids.push(x.id);
-      if(ids.length){await relayCall(r,'/v1/box/ack',{ids,auth:await relayAuth(p,'ack',ids.join(','))});ids.forEach(a=>ACKED.set('l'+a,now+3e5))}
-      if(!res.more&&ids.length===L2.length){ETAG[k]=res.etag||0;break}if(!res.more||!ids.length)break}}
+      const have=new Set(state.letters.map(x=>x.id)),M=myKeys(),ids=[];for(const x of L2)if(typeof x.id==='string'&&ID_RE.test(x.id)&&(have.has(x.id)||(Number.isInteger(x.v)&&x.v>LETTER_V&&++upg)||await junk(x,M)))ids.push(x.id);
+      if(ids.length){await relayCall(r,'/v1/box/ack',{ids,auth:await relayAuth(p,'ack',ids.join(','))})}
+      if(!res.more||!ids.length)break}}
     catch(e){if(!noteBusy(p,e))err=e&&e.message||String(e)}}
   }finally{pulling=false}
-  if(n){lastAct=Date.now();renderCards();toast(`收到 ${n} 封新信`)}
+  if(upg)toast(`有 ${upg} 封信的版本高于本页，已清出信箱；请升级本页后让对方重发`);if(n){lastAct=Date.now();renderCards();toast(`收到 ${n} 封新信`)}
   if(manual){if(err)alert('收信失败：'+err);else if(seatErr)alert('收信正常，但信箱未开通：'+seatErr);else if(!n)toast(!RELAYS.some(relayOn)?'中转配置中未允许任何中转站':!state.identities.some(q=>q.relay)?'没有启用中转的灵宠':!tried?'没有可收信的灵宠（需已解锁，且住地被允许）':'没有新信')}
   return n;
 }
-$('btnRelay').onclick=e=>busy(e.target,async()=>{for(const x in BLOCK)delete BLOCK[x];for(const x in ETAG)delete ETAG[x];await relayPull(true)});
+$('btnRelay').onclick=e=>busy(e.target,async()=>{for(const x in PS)PS[x].block=0;await relayPull(true)});
 $('btnNewChat').onclick=()=>newChatDlg();
 const afterLetters=msg=>{const r=lastImport;if(r.bad||!r.keys.length)alert(msg);if(r.keys.length)chatDlg(r.keys[0].split('|'))}; // 收信成功后直接打开最新一封所在的会话
 $('btnImpLetter').onclick=()=>importDlg('收信','导入信件，支持多封；收件人中没有你的灵宠的信件将被拒收。',d=>addLetters(d,true),false,'p',afterLetters);
@@ -1164,24 +1169,10 @@ const serialize=o=>{ // o.relays：中转白名单；其余部署参数一律置
   {const cs=[...new Set((o.relays||[]).map(u=>new URL(u).origin))];h=h.replace(/connect-src [^;"]*/,'connect-src '+(cs.length?cs.join(' '):"'none'"))} // 联网范围由浏览器按 CSP 强制执行
   return h;
 };
-function wlDlg(){ // 中转白名单同时写在页面的 CSP 里（浏览器据此限制联网范围），运行中无法修改：编辑后导出新页面，替换当前页面才生效
-  let L=RELAYS.slice();
-  push(`<h3>中转白名单</h3><div class="hint keep">白名单同时写入页面的 CSP，运行中无法修改。编辑后点“导出新页面”，用新页面替换当前页面才生效；数据不随页面走，请先备份，在新页面里恢复。</div><div id="wlList"></div><div class="row" style="margin-top:6px"><button id="wlAdd">添加</button></div>
-    <div class="dialog-actions"><button class="primary" id="wlGo">导出新页面</button><button id="wlBack">返回</button></div>`,()=>{
-    const rd=()=>{L=[...document.querySelectorAll('#wlList input')].map(x=>x.value)},
-      paint=()=>{$('wlList').innerHTML=L.map((u,i)=>`<div class="row" style="flex-wrap:nowrap;margin:4px 0"><input type="text" style="flex:1;min-width:0" value="${esc(u)}" placeholder="https://relay.example.com" aria-label="中转站地址"><button class="danger-text" data-d="${i}">删除</button></div>`).join('')||'<div class="sub">暂无，点“添加”</div>';
-        document.querySelectorAll('#wlList [data-d]').forEach(b=>b.onclick=()=>{rd();L.splice(+b.dataset.d,1);paint()})};
-    paint();$('wlBack').onclick=back;
-    $('wlAdd').onclick=()=>{rd();if(L.length>=10)return alert('最多 10 个');L.push('https://');paint();const a=document.querySelectorAll('#wlList input');a[a.length-1].focus()};
-    $('wlGo').onclick=()=>{rd();const rl=[...new Set(L.map(x=>x.trim().replace(/\/+$/,'')).filter(x=>x&&x!=='https://'))];
-      if(rl.length>10||rl.some(u=>!/^https:\/\/[^\s"'<>;]+$/.test(u)||u.length>100))return alert('每个地址须是 https:// 开头，最多 10 个');
-      dl('灵宠空间_模板_v'+VERSION.replace(/\./g,'_')+'.html',new Blob([serialize({relays:rl})],{type:'text/html'}),'text/html');closeAll()};
-  });
-}
 $('btnTpl').onclick=()=>push(`<h3>导出模板</h3><div class="hint keep">模板不含任何数据和私钥</div>
-  <label>中转白名单（可空，每行一个 https 地址；页面只能连接这些地址）</label><textarea id="tpRelay" style="min-height:60px"></textarea>
+  <label>中转白名单（可空，每行一个 https 地址；页面只能连接这些地址；不自动带入当前白名单）</label><textarea id="tpRelay" style="min-height:60px"></textarea>
   <div class="dialog-actions"><button class="primary" id="tpGo">导出</button><button id="tpBack">取消</button></div>`,()=>{
-  $('tpBack').onclick=back;$('tpRelay').value=RELAYS.join('\n');
+  $('tpBack').onclick=back;$('tpRelay').placeholder='https://relay.example.com';
   $('tpGo').onclick=()=>{
     const rl=[...new Set($('tpRelay').value.split('\n').map(x=>x.trim().replace(/\/+$/,'')).filter(Boolean))];
     if(rl.length>10||rl.some(u=>!/^https:\/\/[^\s"'<>;]+$/.test(u)||u.length>100))return alert('中转白名单：最多 10 个，每个须是 https:// 开头的地址');
@@ -1189,14 +1180,14 @@ $('btnTpl').onclick=()=>push(`<h3>导出模板</h3><div class="hint keep">模板
     closeAll();
   };
 });
-const AUTO_OPTS=[[0,'关闭'],[365,'1 年'],[180,'半年'],[90,'3 个月'],[30,'1 个月'],[7,'7 天']];
-function autoClean(){const d=state.meta.autoClean;if(!d)return 0;const o=state.letters.filter(b=>Date.parse(b.timestamp)<Date.now()-d*864e5);if(!o.length)return 0;dropLetters(new Set(o.map(b=>b.id)));return o.length} // 自动清理：按信件时间删除过期信件，只动信件；打开页面和切回前台时执行
+const AUTO_OPTS=[[365,'1 年'],[30,'1 个月'],[3,'3 天']];
+function autoClean(){const d=state.meta.autoClean||365;const o=state.letters.filter(b=>Date.parse(b.timestamp)<Date.now()-d*864e5);if(!o.length)return 0;dropLetters(new Set(o.map(b=>b.id)));return o.length} // 自动清理：按信件时间删除过期信件，只动信件；打开页面和切回前台时执行
 $('btnClear').onclick=()=>{
-  const fl=state.letters.filter(b=>b.kind==='file'),mb=(fl.reduce((n,b)=>n+b.ciphertext.length*.75,0)/1048576).toFixed(1),cur=state.meta.autoClean||0;
+  const fl=state.letters.filter(b=>b.kind==='file'),mb=(fl.reduce((n,b)=>n+b.ciphertext.length*.75,0)/1048576).toFixed(1),cur=state.meta.autoClean||365;
   push(`<h3>清理数据</h3><div class="hint dflt" id="stInfo">自动清理按信件时间定期删除旧信，手动清理立即执行；两者都不可恢复。</div>
     <div class="grp">自动清理信件</div>
     <div class="sub">信件时间早于所选期限的，打开页面时自动删除；灵宠和灵枢不受影响。</div>
-    <div class="row" style="margin-top:6px;flex-wrap:nowrap"><select id="clAuto" style="flex:1;min-width:0;width:auto">${AUTO_OPTS.map(([v,t])=>`<option value="${v}"${v===cur?' selected':''}>${t}${v?'前的信件':''}</option>`).join('')}</select><button class="primary" id="clAutoGo">应用</button></div>
+    <div class="row" style="margin-top:6px;flex-wrap:nowrap"><select id="clAuto" style="flex:1;min-width:0;width:auto">${AUTO_OPTS.map(([v,t])=>`<option value="${v}"${v===cur?' selected':''}>${t}前的信件</option>`).join('')}</select><button class="primary" id="clAutoGo">应用</button></div>
     <div class="grp" style="margin-top:16px">手动清理（立即执行）</div>
     <select id="clMode"><option value="f">只清附件（${fl.length} 个，约 ${mb} MB）；其余保留</option><option value="l">清空全部信件；保留灵宠和灵枢</option><option value="a">清空全部：灵宠、灵枢和信件</option></select>
     <div class="warn-strong">清理后不可恢复。</div>
@@ -1204,11 +1195,11 @@ $('btnClear').onclick=()=>{
     $('clBack').onclick=back;
     if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(e=>{const el=$('stInfo');if(el&&e&&e.usage)el.textContent+=` 本站已用约 ${(e.usage/1048576).toFixed(1)} MB（仅供参考）`}).catch(()=>{});
     $('clAutoGo').onclick=()=>{
-      const d=+$('clAuto').value,o=d?state.letters.filter(b=>Date.parse(b.timestamp)<Date.now()-d*864e5):[],t=(AUTO_OPTS.find(x=>x[0]===d)||[])[1];
+      const d=+$('clAuto').value,o=state.letters.filter(b=>Date.parse(b.timestamp)<Date.now()-d*864e5),t=(AUTO_OPTS.find(x=>x[0]===d)||[])[1];
       if(o.length&&!confirm(`将立即删除 ${o.length} 封${t}前的信件，之后每次打开页面自动清理，不可恢复。确认？`))return;
-      if(d)state.meta.autoClean=d;else delete state.meta.autoClean;
+      state.meta.autoClean=d;
       if(o.length)dropLetters(new Set(o.map(b=>b.id)));
-      renderAll();closeAll();toast(d?`已设置自动清理：${t}前的信件`:'已关闭自动清理');
+      renderAll();closeAll();toast(`已设置自动清理：${t}前的信件`);
     };
     $('clGo').onclick=()=>{
       const mode=$('clMode').value;
@@ -1277,7 +1268,7 @@ $('btnHelp').onclick=()=>push(`<h3>关于</h3>
   </ul>
   <b>快速上手</b>（以微信为例）
   <ol><li>双方在“我的灵宠”页签“孵化灵宠”，保存下载的灵枢文件（_private）。</li>
-  <li>A 在灵宠的“名片·操作”中复制名片发给 B；B 在“好友/群友”页签“添加好友灵宠”导入。反向同理。</li>
+  <li>A 在灵宠的“名片·操作”中复制名片发给 B；B 在“好友”页签“添加好友灵宠”导入。反向同理。</li>
   <li>“写信”→“邮寄”，在弹出的窗口复制或分享给对方；对方点“收信·手动”粘贴。较长的信用“分享(txt)”以文件发送。收到文件时：先预览确认收件人（txt 开头附近的 envelopeNames），再用其他应用打开并复制全文（安卓可选 Chrome 全选复制；iOS 选“拷贝”），回到本页“收信·手动”粘贴；也可保存文件后在“收信·手动”中选择“导入”。</li></ol>
   <b>进阶</b>
   <ol><li><b>添加到主屏幕</b>：以应用方式全屏打开，iOS 不会清除其本地数据。用 Safari 或 Chrome 打开 https:// 页面→“分享/菜单”→“添加到主屏幕”。内置浏览器不支持；iOS 主屏幕应用与 Safari 标签页数据相互独立，须先备份再恢复。</li>
@@ -1350,7 +1341,7 @@ $('btnVer').onclick=e=>{e.preventDefault();
 };
 function contactDlg(){
   const has=CONTACT_ID?state.identities.find(p=>p.id===CONTACT_ID):null;
-  push(`<h3>联系我</h3><div style="font-size:13px">作者的灵宠名片：打开链接并复制页面内容，在“好友/群友”页签通过“添加好友灵宠”导入，即可写信。</div>
+  push(`<h3>联系我</h3><div style="font-size:13px">作者的灵宠名片：打开链接并复制页面内容，在“好友”页签通过“添加好友灵宠”导入，即可写信。</div>
     ${has?`<div class="sub" style="margin-top:8px">已在你的空间中：${esc(has.nickname)}</div>`:''}
     <div class="content-box mono">${esc(CONTACT_URL)}</div>
     <div class="dialog-actions"><button class="primary" id="nOpen">打开链接</button>${has&&!isOwned(has)?'<button id="nWrite">写信</button>':''}<button id="nBack">返回</button></div>`,()=>{
