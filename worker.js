@@ -8,11 +8,13 @@
 //    投信每个收信人 5 行（信件写入+删除、回执写入+删除、杂项）；确认收信/确认回执不再扣费，被投信的人不会因清理信箱而变忙
 //  · 取信不进预算，只按灵宠限频（每分钟 SOFT_PER_MIN 次，DO 内存计数，单实例所以准确）；响应里带建议轮询间隔 poll
 //  · 超额返回 429 {error:'busy', retry:秒}，客户端把该灵宠标为“中转·忙”
+//  · 代客续座：整点闹钟给“座位将到期（或刚到期）、且最近 IDLE_RENEW_D 天内取过信”的灵宠续座，用户关机也不掉座；活动时间由取信顺带记录（每小时最多写一次）
+//  · 离座：灵宠换住地 / 关中转 / 解除契约时签名调用 /v1/box/leave，立刻撤掉座位，别人不能再向它投信；箱里已有的信和回执留到过期清理
 // 环境变量（可选）：ALLOW_ORIGINS、MAX_SEATS、MAX_SEATS_PER_IP、DAY_BUDGET、SOFT_PER_MIN
 import {DurableObject} from 'cloudflare:workers';
 const TTL=7*86400, MAX_LETTER=300000, MAX_BODY=400000, MAX_ALLOW=200, MAX_TO=50, MAX_FETCH=20, MAX_RD=40, MAX_RESP=12e6, SKEW=5*60*1000;
 const MAX_SEATS=50, SEAT_MIN_H=24, SEAT_MAX_H=48, TIGHT_MIN_H=6, TIGHT_MAX_H=12, TIGHT_RATIO=0.8, RENEW_LEFT_H=4, MAX_BOX_N=30, MAX_RC=200, MAX_ADD_CHANGES=10, MAX_SEATS_PER_IP=10;
-const DAY_BUDGET=50000, MIN_ACTIVE=5, BORROW=3, ACTIVE_MS=15*6e4, SOFT_PER_MIN=40, DROP_COST=5;
+const IDLE_RENEW_D=7, DAY_BUDGET=50000, MIN_ACTIVE=5, BORROW=3, ACTIVE_MS=15*6e4, SOFT_PER_MIN=40, DROP_COST=5;
 const num=(v,d)=>Number.isFinite(+v)&&+v>0?+v:d;
 const ID_RE=/^id_[0-9a-f]{32}$/;
 const CORS={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type','Access-Control-Max-Age':'86400'};
@@ -35,21 +37,23 @@ async function auth(op,a,extra){ // 验请求签名：签名覆盖 操作+指纹
 
 export class Relay extends DurableObject{
   constructor(ctx,env){super(ctx,env);this.sql=ctx.storage.sql;this.act=new Map();this.hit=new Map();
-    ['CREATE TABLE IF NOT EXISTS seat(fp TEXT PRIMARY KEY,l TEXT,exp INTEGER,ch TEXT)', // 座位：允许名单、到期时间、近 24h 扩大名单的时间
+    ['CREATE TABLE IF NOT EXISTS seat(fp TEXT PRIMARY KEY,l TEXT,exp INTEGER,ch TEXT,la INTEGER DEFAULT 0)', // 座位：允许名单、到期时间、近 24h 扩大名单的时间、最近活动时间
      'CREATE TABLE IF NOT EXISTS mail(fp TEXT,id TEXT,v TEXT,t INTEGER,PRIMARY KEY(fp,id))', // 信箱里的信（整封密文）
      'CREATE TABLE IF NOT EXISTS rc(fp TEXT,by TEXT,id TEXT,t INTEGER,PRIMARY KEY(fp,by,id))', // 已读回执：寄信人信箱 fp，读者 by，信件 id
      'CREATE TABLE IF NOT EXISTS ipseat(ip TEXT,fp TEXT,t INTEGER,PRIMARY KEY(ip,fp))', // 同一网络近期开通的信箱
      'CREATE TABLE IF NOT EXISTS q(fp TEXT PRIMARY KEY,h INTEGER,s REAL)', // 灵宠本小时已用额度
      'CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY,v TEXT)'].forEach(s=>this.sql.exec(s));
+    try{this.sql.exec('ALTER TABLE seat ADD COLUMN la INTEGER DEFAULT 0')}catch{} // 旧库补列；新库已有该列，报错忽略
     ctx.blockConcurrencyWhile(async()=>{if(!await ctx.storage.getAlarm())await ctx.storage.setAlarm(Date.now()+36e5)})}
   async alarm(){ // 每小时清理过期数据
-    const now=Date.now(),hr=Math.floor(now/36e5);
+    const now=Date.now(),hr=Math.floor(now/36e5),n=this.seatCount();
+    for(const r of this.rows('SELECT fp FROM seat WHERE exp<? AND la>?',now+RENEW_LEFT_H*36e5,now-IDLE_RENEW_D*864e5))this.sql.exec('UPDATE seat SET exp=? WHERE fp=?',now+this.ttlOf(n)*1000,r.fp); // 代客续座，须在清理过期座位之前
     this.sql.exec('DELETE FROM mail WHERE t<?',now-TTL*1000);this.sql.exec('DELETE FROM rc WHERE t<?',now-TTL*1000);
     this.sql.exec('DELETE FROM seat WHERE exp<?',now);this.sql.exec('DELETE FROM ipseat WHERE t<?',now-SEAT_MAX_H*36e5);this.sql.exec('DELETE FROM q WHERE h<?',hr-1);
     await this.ctx.storage.setAlarm(now+36e5)}
   one(q,...a){return this.sql.exec(q,...a).toArray()[0]}
   rows(q,...a){return this.sql.exec(q,...a).toArray()}
-  seatOf(fp){const a=this.one('SELECT l,exp,ch FROM seat WHERE fp=?',fp);return a&&a.exp>Date.now()?{l:JSON.parse(a.l),exp:a.exp,ch:JSON.parse(a.ch)}:null}
+  seatOf(fp){const a=this.one('SELECT l,exp,ch,la FROM seat WHERE fp=?',fp);return a&&a.exp>Date.now()?{l:JSON.parse(a.l),exp:a.exp,ch:JSON.parse(a.ch),la:a.la||0}:null}
   seatCount(){return this.one('SELECT COUNT(*) c FROM seat WHERE exp>?',Date.now()).c}
   ttlOf(n){const s=num(this.env.MAX_SEATS,MAX_SEATS),t=n>=s*TIGHT_RATIO,lo=t?TIGHT_MIN_H:SEAT_MIN_H,hi=t?TIGHT_MAX_H:SEAT_MAX_H;return Math.floor((lo+Math.random()*(hi-lo))*3600)} // 座位够用 24~48 小时随机；吃紧 6~12 小时随机
   activeN(){const t=Date.now()-ACTIVE_MS;let n=0;for(const[k,v]of this.act)if(v>t)n++;else this.act.delete(k);return n}
@@ -83,14 +87,15 @@ export class Relay extends DurableObject{
       this.sql.exec('INSERT OR REPLACE INTO ipseat VALUES(?,?,?)',ip,fp,now)}
     if(adds>0){if(ch.length>=MAX_ADD_CHANGES)return[429,{error:'too many changes'}];ch.push(now)}
     const exp=need?now+this.ttlOf(used==null?this.seatCount():used)*1000:live.exp;
-    this.sql.exec('INSERT OR REPLACE INTO seat VALUES(?,?,?,?)',fp,JSON.stringify(list),exp,JSON.stringify(ch));
+    this.sql.exec('INSERT OR REPLACE INTO seat(fp,l,exp,ch,la) VALUES(?,?,?,?,?)',fp,JSON.stringify(list),exp,JSON.stringify(ch),now);
     return[200,{ok:1,n:list.length,exp}]}
   pull(fp){ // 取信：一次查询；不扣预算，只限频
     const now=Date.now();this.act.set(fp,now);if(this.soft(fp))return[429,{error:'busy',retry:30}];
-    const a=this.seatOf(fp),ms=this.rows('SELECT id,v FROM mail WHERE fp=? AND t>? ORDER BY t LIMIT ?',fp,now-TTL*1000,MAX_FETCH+1),rs=this.rows('SELECT by,id FROM rc WHERE fp=? AND t>? LIMIT ?',fp,now-TTL*1000,MAX_RD+1);
+    const a=this.seatOf(fp);if(a&&now-a.la>36e5)this.sql.exec('UPDATE seat SET la=? WHERE fp=?',now,fp); // 活动时间每小时最多记一次，省写入
+    const ms=this.rows('SELECT id,v FROM mail WHERE fp=? AND t>? ORDER BY t LIMIT ?',fp,now-TTL*1000,MAX_FETCH+1),rs=this.rows('SELECT by,id FROM rc WHERE fp=? AND t>? LIMIT ?',fp,now-TTL*1000,MAX_RD+1);
     let more=ms.length>MAX_FETCH||rs.length>MAX_RD,n=0;const out=[];
     for(const m of ms.slice(0,MAX_FETCH)){if(out.length&&n+m.v.length>MAX_RESP){more=true;break}n+=m.v.length;out.push(m.v)}
-    return[200,`{"letters":[${out.join(',')}],"reads":${JSON.stringify(rs.slice(0,MAX_RD).map(r=>({id:r.id,by:r.by})))},"more":${more},"etag":0,"seat":${a?a.exp:0},"poll":${Math.max(8,Math.ceil(this.activeN()*.6))}}`]}
+    return[200,`{"letters":[${out.join(',')}],"reads":${JSON.stringify(rs.slice(0,MAX_RD).map(r=>({id:r.id,by:r.by})))},"more":${more},"seat":${a?a.exp:0},"poll":${Math.max(8,Math.ceil(this.activeN()*.6))}}`]}
   read(fp,to,ids){ // 已读回执：读者 fp 须在寄信人 to 的允许名单里
     const a=this.seatOf(to);if(!a||!a.l.includes(fp))return[200,{ok:1,done:false}];
     if(this.one('SELECT COUNT(*) c FROM rc WHERE fp=?',to).c+ids.length>MAX_RC)return[200,{ok:1,done:false}]; // 回执堆积：寄信人不取就不再收
@@ -98,6 +103,7 @@ export class Relay extends DurableObject{
     const now=Date.now();for(const id of ids)this.sql.exec('INSERT OR REPLACE INTO rc VALUES(?,?,?,?)',to,fp,id,now);return[200,{ok:1,done:true}]}
   rdack(fp,rd){for(const x of rd)this.sql.exec('DELETE FROM rc WHERE fp=? AND by=? AND id=?',fp,x.by,x.id);return[200,{ok:1}]}
   ack(fp,ids){for(const i of ids)this.sql.exec('DELETE FROM mail WHERE fp=? AND id=?',fp,i);return[200,{ok:1}]}
+  leave(fp){if(this.soft(fp))return[429,{error:'busy',retry:30}];this.sql.exec('DELETE FROM seat WHERE fp=?',fp);return[200,{ok:1}]} // 离座：只撤座位；信和回执留到过期清理，座位名额占用的网络配额（ipseat）也不退
   quota(fp){const b=this.budget(fp);return[200,{ok:1,room:Math.floor(b.room),floor:Math.floor(b.fl),cap:Math.floor(b.fl*BORROW),spent:Math.floor(b.s),hp:Math.floor(b.hp),hs:Math.floor(b.hs),used:Math.floor(b.used),budget:b.D,active:b.act,seats:this.seatCount(),maxSeats:num(this.env.MAX_SEATS,MAX_SEATS),resetIn:b.retry}]}
 }
 
@@ -131,8 +137,8 @@ const handle=async(req,env)=>{
     const ip=hex((await sha('ip\n'+(req.headers.get('CF-Connecting-IP')||''))).slice(0,8));
     return out(await stub.allow(fp,[...new Set(l)],rn,ip));
   }
-  if(path==='/v1/box/fetch'){ // 取信：{auth, since}（since 仅为兼容旧客户端，已不使用）
-    const since=Number(b&&b.since)||0,fp=await auth('fetch',b&&b.auth,String(since));
+  if(path==='/v1/box/fetch'){ // 取信：{auth}（签名内容固定为 '0'，与旧客户端兼容；旧客户端多带的 since 被忽略）
+    const fp=await auth('fetch',b&&b.auth,'0');
     if(!fp)return reply({error:'auth'},401);
     return out(await stub.pull(fp));
   }
@@ -150,6 +156,10 @@ const handle=async(req,env)=>{
     if(!idList(b&&b.ids,MAX_FETCH*2))return reply({error:'bad ack'},400);
     const fp=await auth('ack',b.auth,b.ids.join(','));if(!fp)return reply({error:'auth'},401);
     return out(await stub.ack(fp,b.ids));
+  }
+  if(path==='/v1/box/leave'){ // 离座：{auth}
+    const fp=await auth('leave',b&&b.auth,'');if(!fp)return reply({error:'auth'},401);
+    return out(await stub.leave(fp));
   }
   if(path==='/v1/box/quota'){ // 查询本灵宠额度：{auth}
     const fp=await auth('quota',b&&b.auth,'');if(!fp)return reply({error:'auth'},401);
