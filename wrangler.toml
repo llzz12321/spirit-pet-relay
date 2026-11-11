@@ -1,0 +1,15 @@
+name = "spirit-pet-relay"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[[durable_objects.bindings]]
+name = "RELAY"
+class_name = "Relay"
+
+# 免费版只支持 SQLite 版 Durable Object
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Relay"]
+
+[vars]
+ALLOW_ORIGINS = ""
