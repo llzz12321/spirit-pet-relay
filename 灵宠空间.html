@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>灵宠空间</title>
-<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-11T12:11:53Z">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-rg3xG1hQGXQNGC4gGlFsFZaTkzG/5HWKNbladwal/88='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-12T00:45:59Z">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-QVSLKxXpRs4K4DQdM/9yUxSj53vWa6cYqN1feK1ozDg='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <style>
 :root{--bg:#f5f5f4;--panel:#fff;--border:#e0ddd6;--text:#2a2823;--muted:#6f6c63;--accent:#3c6e5c;--danger:#b3452f;--warn:#8a5a1f}
 *{box-sizing:border-box}
@@ -135,7 +135,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
 <!-- 部署配置（部署脚本只需改写下面的 JSON，请勿改动其他脚本内容，否则 CSP 哈希失效）：bulletinUrl / bulletinExpires 张贴栏链接（https）及有效期 YYYY-MM-DD，过期后自动不显示；repoUrl 源码仓库链接（https，可空，显示在页脚和技术说明）；contactUrl “联系我”页面的链接（https，作者的灵宠名片），contactId 该灵宠的 id（可空）；relays 中转白名单（https，须与 CSP 的 connect-src 一致，建议用“导出模板”生成）。 -->
 <script id="deploy-config" type="application/json">{"bulletinUrl":"","bulletinExpires":"","contactUrl":"","contactId":"","repoUrl":"https://github.com/llzz12321/spirit-pet-relay"}</script>
 <script id="container-json" type="application/json">
-{"meta":{"spaceName":"灵宠空间","version":"0.30.10"},"identities":[],"letters":[]}
+{"meta":{"spaceName":"灵宠空间","version":"0.30.12"},"identities":[],"letters":[]}
 </script>
 
 <script>
@@ -151,7 +151,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
    中转开关：identity.relay（仅本地；启用后经住地中转站收发信件和回执；与口令锁定无关）
    未读：state.reads[信件id].n = 1（新收到、尚未打开会话；用于红点）
    信件字段：sender（寄信人）、kind（text / file）*/
-const VERSION='0.30.10';
+const VERSION='0.30.12';
 const DATA_SCHEMA=1,LETTER_V=1,SEAL_V=1; // 数据结构版本（备份文件/本地库）、信件协议版本（信件字段 v，进入签名和 AAD）、口令封装版本（sealedKeys.v）。高于本页支持的一律拒绝并提示升级；低于的经 migrate() 逐级升级
 const migrate=d=>d; // 备份文件 schema 低于 DATA_SCHEMA 时在此逐级升级（目前为空）
 const ID_RE=/^id_[0-9a-f]{32}$/; // 灵宠 id 与信件 id 的统一格式
@@ -174,6 +174,7 @@ const bulletinHint=()=>BULLETIN?`<br>也可在<a href="${esc(BULLETIN)}" target=
 const initial=JSON.parse($('container-json').textContent);
 const validIdentity=p=>p&&typeof p.encPub==='string'&&p.encPub.length<100&&typeof p.signPub==='string'&&p.signPub.length<100&&typeof p.id==='string'&&ID_RE.test(p.id);
 const S=(v,n)=>typeof v==='string'&&v.length<=n;
+const validBorn=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(v); // 密钥生成时间（UTC）：随名片传递，仅作提示，不参与指纹，不进入信件
 // sealedKeys：口令加密后的灵枢，即 AES-GCM 加密的 {encPriv, signPriv}（加密用与签名用的两个私钥），与明文的 encPriv/signPriv 二选一
 const validSealed=l=>!!l&&typeof l==='object'&&l.v===SEAL_V&&l.kdf==='PBKDF2-SHA256'&&Number.isInteger(l.iter)&&l.iter>=100000&&l.iter<=5000000&&S(l.salt,64)&&S(l.iv,32)&&S(l.ct,3000);
 const cleanSealed=l=>({v:SEAL_V,kdf:'PBKDF2-SHA256',iter:l.iter,salt:l.salt,iv:l.iv,ct:l.ct});
@@ -188,7 +189,8 @@ function normalize(d){ // 校验并规范化来自 HTML 的数据（初始数据
     const o={id:String(p.id).slice(0,100),nickname:String(p.nickname||'').slice(0,30),about:String(p.about||'').slice(0,200),remark:String(p.remark||'').slice(0,30),group:p.group==='member'||p.group==='verified'?p.group:'friend',relayUrl:String(p.relayUrl||'').slice(0,100),encPub:p.encPub,signPub:p.signPub};
     if(ok){o.encPriv=p.encPriv;o.signPriv=p.signPriv}else if(validSealed(p.sealedKeys))o.sealedKeys=cleanSealed(p.sealedKeys);
     if(p.needsKeyBackup===1&&(o.encPriv||o.sealedKeys))o.needsKeyBackup=1;
-    if(p.dormant===1&&!o.encPriv&&!o.sealedKeys)o.dormant=1; // 休眠：已解除契约、无私钥，仍留在“我的灵宠”，导入灵枢后苏醒
+    if(p.dormant===1&&!o.encPriv&&!o.sealedKeys)o.dormant=1;
+    if(validBorn(p.born))o.born=p.born; // 休眠：已解除契约、无私钥，仍留在“我的灵宠”，导入灵枢后苏醒
     if(p.relay===1&&(o.encPriv||o.sealedKeys)&&rc<MAX_RELAY){o.relay=1;rc++} // 超出上限的按顺序关闭中转
     if(['member','friend','verified'].includes(p.allow)&&(o.encPriv||o.sealedKeys))o.allow=p.allow;
     return o;
@@ -260,7 +262,8 @@ async function busy(btn,task){
 const letterFileName=async b=>{let t='';try{if(readerOf(b))t=b.kind==='text'?(await textOf(b)).slice(0,2000):String((await metaOf(b)).filename||'')}catch{}
   const a=[...t.replace(/[\p{P}\p{S}\p{C}\s]/gu,'')].slice(0,7);while(a.length<7)a.push('_');
   return `信件_${a.map((c,i)=>i%2?'_':c).join('')}_${b.id.slice(3,7)}.txt`}; // 文件名：正文（附件取文件名）前 7 个非标点字符的第 1、3、5、7 位，第 2、4、6 位用“_”占位，不足用“_”补
-const identityData=(p,withSecrets)=>({id:p.id,nickname:p.nickname,about:p.about||'',...(withSecrets?{remark:p.remark||'',group:p.group==='member'||p.group==='verified'?p.group:'friend'}:{}),relayUrl:p.relayUrl||'',encPub:p.encPub,signPub:p.signPub,...(withSecrets&&p.encPriv?{encPriv:p.encPriv,signPriv:p.signPriv}:{}),...(withSecrets&&p.sealedKeys?{sealedKeys:p.sealedKeys}:{}),...(withSecrets&&p.needsKeyBackup?{needsKeyBackup:1}:{}),...(withSecrets&&p.dormant&&!p.encPriv&&!p.sealedKeys?{dormant:1}:{}),...(withSecrets&&p.relay?{relay:1}:{}),...(withSecrets&&p.allow?{allow:p.allow}:{})});
+const letterSender=(p,hab)=>{const d=identityData(p,false);delete d.born;if(!hab)d.relayUrl='';return d}; // 信件里的寄信人：不带 born（旧版会丢弃未知字段而验签失败）；住地由“含住地”决定，写入后进入签名
+const identityData=(p,withSecrets)=>({id:p.id,nickname:p.nickname,about:p.about||'',...(withSecrets?{remark:p.remark||'',group:p.group==='member'||p.group==='verified'?p.group:'friend'}:{}),relayUrl:p.relayUrl||'',...(p.born?{born:p.born}:{}),encPub:p.encPub,signPub:p.signPub,...(withSecrets&&p.encPriv?{encPriv:p.encPriv,signPriv:p.signPriv}:{}),...(withSecrets&&p.sealedKeys?{sealedKeys:p.sealedKeys}:{}),...(withSecrets&&p.needsKeyBackup?{needsKeyBackup:1}:{}),...(withSecrets&&p.dormant&&!p.encPriv&&!p.sealedKeys?{dormant:1}:{}),...(withSecrets&&p.relay?{relay:1}:{}),...(withSecrets&&p.allow?{allow:p.allow}:{})});
 
 /* ---------- crypto ---------- */
 const XK={name:'X25519'},Z12=new Uint8Array(12); // Z12：包装密钥的固定 IV，仅因 KEK 每封信、每个收件人都唯一（临时密钥 + 盐）才安全，切勿复用 KEK
@@ -287,6 +290,7 @@ async function encrypt(bytes,aad){
 /* ---------- 灵枢口令保护（可选）：PBKDF2-SHA256 → AES-GCM 加密两个私钥 ---------- */
 const KDF_ITER=600000;
 const isOwned=p=>!!(p.encPriv||p.sealedKeys);
+const aged=p=>!p.dormant&&validBorn(p.born)&&Date.now()-Date.parse(p.born)>365*864e5,agedTag=p=>aged(p)?'<span class="tag" style="background:var(--warn)" title="已使用超过1年">!</span>':''; // 密钥使用满 1 年：提示换新
 const mineOf=p=>isOwned(p)||!!p.dormant; // 属于“我的灵宠”：持有灵枢，或已休眠（解除契约后等待导入灵枢苏醒）
 const isUnlocked=p=>!!(p.encPriv||(p.sealedKeys&&encKeyCache[p.encPub]&&signKeyCache[p.encPub])); // 持有可用契约：明文契约，或已加口令且本次会话已解锁
 const sealAad=pub=>new TextEncoder().encode('spirit-pet-space/seal/v2\n'+pub); // 绑定公钥，防止加密块被换到别的灵宠上
@@ -615,9 +619,9 @@ function renderIdentities(){touch();renderTabs();
   if(TAB==='chat'){$('idList').innerHTML='';$('moreId').innerHTML='';return}
   const q=Q.ident.trim().toLowerCase(),all=identitiesOf(TAB).filter(p=>!q||[p.nickname,p.remark,p.about].some(s=>String(s||'').toLowerCase().includes(q))).sort((a,b)=>GR(a)-GR(b)||NCMPF(a.nickname,b.nickname)||NCMPF(a.remark,b.remark)),L=all.slice(0,PAGE[TAB]);
   let lastG=-1;const GC={};all.forEach(p=>{const g=GR(p);GC[g]=(GC[g]||0)+1});$('idList').innerHTML=L.map(p=>{const id=esc(p.id),o=openIds.has(p.id),g=GR(p),hd=TAB!=='mine'&&g!==lastG?`<div class="grp">${GN[g]}（${GC[g]}）</div>`:'';lastG=g;return hd+`<div class="card ident${o?' open':''}" data-id="${id}">
-    <div class="ph" data-a="tog"><b>${esc(p.nickname)}${p.remark?` <span class="sub">${esc(p.remark)}</span>`:''}</b>${TAB==='mine'?tagOf(p):''}<span class="arr">▾</span></div>
-    <div class="pbody"><div class="sub" style="margin-top:6px">${p.about?esc(p.about):'（无简介）'}</div>${p.dormant?'<div class="sub" style="color:var(--warn)">休眠中：点上方“导入灵枢”选择该灵宠的灵枢文件即可苏醒</div>':''}
-    <div class="sub mono">指纹 ${esc(fullId(p.id))}</div>${p.relayUrl?`<div class="sub">住地 <span class="mono" style="word-break:break-all">${esc(p.relayUrl)}</span></div>`:''}
+    <div class="ph" data-a="tog"><b>${esc(p.nickname)}${p.remark?` <span class="sub">${esc(p.remark)}</span>`:''}</b>${TAB==='mine'?tagOf(p):''}${agedTag(p)}<span class="arr">▾</span></div>
+    <div class="pbody">${aged(p)?`<div class="sub" style="margin-top:6px;color:var(--warn)">${TAB==='mine'?'已使用超过1年，建议换新名片并分享给好友':'已使用超过1年'}</div>`:''}<div class="sub" style="margin-top:6px">${p.about?esc(p.about):'（无简介）'}</div>${p.dormant?'<div class="sub" style="color:var(--warn)">休眠中：点上方“导入灵枢”选择该灵宠的灵枢文件即可苏醒</div>':''}
+    <div class="sub mono">指纹 ${esc(fullId(p.id))}</div>${p.born?`<div class="sub">密钥生成 ${esc(fmtDate(p.born))}</div>`:''}${p.relayUrl?`<div class="sub">住地 <span class="mono" style="word-break:break-all">${esc(p.relayUrl)}</span></div>`:''}
     <div class="card-actions">${mineOf(p)?'':'<button data-a="dm">写信</button>'}<button data-a="raw">名片·操作</button>${!mineOf(p)?'<button data-a="vfy">核实·分组</button>':''}${actsOf(p)}${isOwned(p)?'<button data-a="exk">导出灵枢</button>'+(p.needsKeyBackup?'<button data-a="bkok" title="确认灵枢文件已备份" style="background:var(--danger);color:#fff;border-color:var(--danger)">已备份?</button>':''):''}${isOwned(p)?'<button data-a="unbind">解除契约</button>':''}<button data-a="del" class="danger-text">删除</button></div></div></div>`}).join('')
     ||`<div class="sub">${q?'没有匹配的灵宠':{mine:'暂无灵宠',friend:'暂无联系人'}[TAB]}</div>`;
   $('moreId').innerHTML=all.length>L.length?`<button id="btnMoreI">显示更多（还有 ${all.length-L.length} 个）</button>`:'';
@@ -779,7 +783,7 @@ $('btnTame').onclick=()=>{
       const pub=ab2b64(await crypto.subtle.exportKey('raw',kp.publicKey)),spub=ab2b64(await crypto.subtle.exportKey('raw',sp.publicKey));
       const ident={id:await fingerprintOf(pub,spub),nickname:$('tName').value.trim().slice(0,30)||'未命名灵宠',about:$('tDesc').value.trim().slice(0,200),relayUrl:'', // 住地默认留空：与好友约定前不暴露中转站网址
         
-        encPub:pub,encPriv:await crypto.subtle.exportKey('jwk',kp.privateKey),
+        born:nowStamp(),encPub:pub,encPriv:await crypto.subtle.exportKey('jwk',kp.privateKey),
         signPub:spub,signPriv:await crypto.subtle.exportKey('jwk',sp.privateKey)};
       if(pw)await applySeal(ident,{encPriv:ident.encPriv,signPriv:ident.signPriv},pw);
       ident.needsKeyBackup=1;state.identities.push(ident);renderAll();
@@ -805,7 +809,7 @@ async function addIdentities(data,withSecrets,defGroup,local){ // defGroup：新
       const want=local&&(d.group==='member'||d.group==='friend'||d.group==='verified')?d.group:(defGroup||'friend'); // 按添加时选的分类（好友）；已有灵宠只会被移到好友列表，不会被降为群友
       if(!p){if(state.identities.length>=MAX_IDENTITIES)throw 'full';p={id:d.id,remark:'',group:want};state.identities.push(p);add++}else{ow++;if(local)p.group=want;else if(want==='friend'&&p.group==='member')p.group='friend'}
       p.nickname=String(d.nickname||'未命名灵宠').slice(0,30);p.about=String(d.about||'').slice(0,200);if(d.relayUrl||withSecrets||local||!p.relayUrl)p.relayUrl=String(d.relayUrl||'').slice(0,100); // 名片没写住地时，不覆盖本地已约定的住地
-      p.encPub=d.encPub;p.signPub=d.signPub;if(!withSecrets&&local&&d.dormant&&!isOwned(p))p.dormant=1;
+      p.encPub=d.encPub;p.signPub=d.signPub;if(validBorn(d.born)&&(!p.born||d.born<p.born))p.born=d.born;if(!withSecrets&&local&&d.dormant&&!isOwned(p))p.dormant=1;
       if(d.remark&&(local||withSecrets))p.remark=String(d.remark).slice(0,30);
       if(withSecrets){
         delete p.dormant;if(sealed){p.sealedKeys=cleanSealed(d.sealedKeys);delete p.encPriv;delete p.signPriv;nl++}
@@ -933,8 +937,8 @@ function chatDlg(parts){
   const relHtml=relBox(parts);
   const key=keyOf(parts),m=myKeys();
   const arch=!parts.some(k=>m.has(k)),my=arch?[]:state.identities.filter(p=>isUnlocked(p)&&parts.includes(p.encPub)); // 会话至少 1 个成员，一对一也是群会话；arch：会话里没有自己的灵宠，只读
-  const menu=`<div id="cMenu" class="cmenu" style="display:none"><button id="cRen">修改群名</button><button id="cExp">导出本会话</button><button id="cGrp">导出群名片</button>${arch?'':'<button id="cAddM">添加成员</button>'}<button id="cDel" class="danger-text">删除会话</button></div>`;
-  const cmp=my.length?`<div class="comp"><div class="mrow"><button type="button" class="tg" id="cSenderT"></button><button type="button" class="tg" id="cMemT"></button><label class="key-check" title="成员昵称将明文写入信件"><input type="checkbox" id="cEnv" checked> 写信封</label></div><div id="cSenderBox" class="pick" style="display:none">${my.map((p,i)=>`<label class="key-check"><input type="radio" name="cSenderR" value="${esc(p.id)}"${i?'':' checked'}> ${whoOf(p.encPub)}</label>`).join('')}</div><div id="cKeys" class="pick" style="display:none"><div class="sub" style="margin:2px 0">默认发给全部成员；只选部分成员时，信件归入仅含所选成员的会话。</div>${parts.map(k=>`<label class="key-check"><input type="checkbox" value="${esc(k)}" checked> ${whoOf(k)}</label>`).join('')}</div><div class="inrow"><button id="cAtt" title="附件（5MB 内随信发送；5~50MB 为大文件，单独保存）">📎</button><textarea id="cText" rows="1" placeholder="输入内容（加密发送）"></textarea><button class="primary" id="cSend">邮寄</button><input type="file" id="cFile" style="display:none"></div><div class="hint">“邮寄”加密并签名生成信件；${my.some(p=>p.relay)?'启用中转的灵宠且中转站被允许时自动投递，否则在弹出窗口中复制或分享。':'在弹出窗口中复制或分享。'}<br>“写信封”将成员昵称以明文写入信件。<br>附件：≤5MB 随信发送；5~50MB 为大文件，单独保存。</div></div>`:`<div class="warn-line">${arch?'会话中已无你的灵宠，无法解读和发信，仅可导出或删除。':'无可用于发信的灵宠（需已建立契约并解锁）。'}</div>`;
+  const menu=`<div id="cMenu" class="cmenu" style="display:none"><button id="cRen">修改会话名</button><button id="cExp">导出本会话</button><button id="cGrp">导出群名片</button>${arch?'':'<button id="cAddM">添加成员</button>'}<button id="cDel" class="danger-text">删除会话</button></div>`;
+  const cmp=my.length?`<div class="comp"><div class="mrow"><button type="button" class="tg" id="cSenderT"></button><button type="button" class="tg" id="cMemT"></button><label class="key-check" title="成员昵称将明文写入信件"><input type="checkbox" id="cEnv" checked> 写信封</label><label class="key-check" style="margin-left:6px" title="把你的住地写进信件，对方才能经中转回执、回信"><input type="checkbox" id="cHab"> 含住地</label></div><div id="cSenderBox" class="pick" style="display:none">${my.map((p,i)=>`<label class="key-check"><input type="radio" name="cSenderR" value="${esc(p.id)}"${i?'':' checked'}> ${whoOf(p.encPub)}</label>`).join('')}</div><div id="cKeys" class="pick" style="display:none"><div class="sub" style="margin:2px 0">默认发给全部成员；只选部分成员时，信件归入仅含所选成员的会话。</div>${parts.map(k=>`<label class="key-check"><input type="checkbox" value="${esc(k)}" checked> ${whoOf(k)}</label>`).join('')}</div><div class="inrow"><button id="cAtt" title="附件（5MB 内随信发送；5~50MB 为大文件，单独保存）">📎</button><textarea id="cText" rows="1" placeholder="输入内容（加密发送）"></textarea><button class="primary" id="cSend">邮寄</button><input type="file" id="cFile" style="display:none"></div><div class="hint">“邮寄”加密并签名生成信件；${my.some(p=>p.relay)?'启用中转的灵宠且中转站被允许时自动投递，否则在弹出窗口中复制或分享。':'在弹出窗口中复制或分享。'}<br>“写信封”将成员昵称以明文写入信件；“含住地”把你的住地写入信件（签名后不能再去掉），对方才能经中转回执、回信；仅当全部对方都能经中转投递时默认勾选，投不齐会另发一封不含住地的同文信供手动发送。<br>附件：≤5MB 随信发送；5~50MB 为大文件，单独保存。</div></div>`:`<div class="warn-line">${arch?'会话中已无你的灵宠，无法解读和发信，仅可导出或删除。':'无可用于发信的灵宠（需已建立契约并解锁）。'}</div>`;
   push(`<div class="cw"><h3 class="ch"><button class="ib" id="cBack" title="返回"><svg width="10" height="18" viewBox="0 0 10 18" aria-hidden="true"><path d="M8 1.5L2 9l6 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span id="cTitleH">${esc(cut(convNameOf(parts),60))}</span><button class="ib" id="cMore" title="更多">⋮</button></h3>${menu}${relHtml}<div id="tl" class="tl"></div>${cmp}</div>`,()=>{
     const tl=$('tl'),list=()=>(convs().find(c=>c.k===key)||{list:[]}).list;
     let selId=null;const paint=(keep)=>{const st=tl.scrollTop,atBot=tl.scrollHeight-st-tl.clientHeight<40,fx=()=>{if(!keep||atBot)tl.scrollTop=tl.scrollHeight};{const e=$('cTitleH');if(e)e.textContent=cut(convNameOf(parts),60)}
@@ -967,20 +971,31 @@ function chatDlg(parts){
         $('cSenderT').textContent='发信人：'+(s=>s.length>5?s.slice(0,5)+'…':s)(nameOf(fe))+(my.length>1?' ▾':'');
         const n=a.filter(i=>i.checked).length;$('cMemT').textContent='成员：'+(n===a.length?'全部 ':'已选 ')+n+' 位 ▾'},
       tgl=(b,box,on)=>{if(on)b.onclick=()=>{const show=box.style.display==='none';[$('cSenderBox'),keysEl].forEach(x=>{x.style.display='none'});box.style.display=show?'':'none'};else b.style.cursor='default'};
+    let habManual=false;const habSync=()=>{const f=state.identities.find(p=>p.id===senderId()),c=$('cHab');c.disabled=!(f&&relayOf(f.relayUrl));if(c.disabled)c.checked=false;else if(!habManual)c.checked=relayOK(f,[...keysEl.querySelectorAll('input:checked')].map(i=>i.value))}; // 没有住地则不可勾；全部对方都能经中转时默认勾，否则默认不勾；用户手动改过就不再自动变
     tgl($('cSenderT'),$('cSenderBox'),my.length>1);tgl($('cMemT'),keysEl,true);
-    $('cSenderBox').onchange=sync;keysEl.onchange=sync;sync();
+    $('cSenderBox').onchange=()=>{habManual=false;sync();habSync()};keysEl.onchange=()=>{sync();habSync()};$('cHab').onchange=()=>{habManual=true};sync();habSync();
     const doSend=async(kind,payload)=>{
       const senderIdentity=state.identities.find(p=>p.id===senderId()&&isUnlocked(p));if(!senderIdentity)throw new Error('请选择发信灵宠');
-      if(state.letters.length>=MAX_LETTERS)throw new Error('信件数量已达上限');
+      if(state.letters.length>=MAX_LETTERS-1)throw new Error('信件数量已达上限'); // 留一封给“退回手动”的同文信
       const keys=[...new Set([...document.querySelectorAll('#cKeys input:checked')].map(i=>i.value).concat(senderIdentity.encPub))];if(keys.length>MAX)throw new Error(`一封信最多 ${MAX} 位成员（含寄信灵宠），请减少成员`); // 寄信人自动成为收件人，才能读到自己发出的信
       const envelopeNames=$('cEnv').checked?keys.map(envNick):[]; // 写到信封：含寄信人和全部收信人；不写则为空数组
-      const raw=await sealLetter({v:LETTER_V,id:genId(),kind,sender:identityData(senderIdentity,false),timestamp:nowStamp(),recipientKeys:keys,envelopeNames},payload);
-      await signLetter(raw,senderIdentity);const blk=cleanLetter(raw); // 规范字段顺序（envelopeNames 紧跟 id）
-      if(est(state.letters.concat(blk))>MAX_COPY)throw new Error('空间内容已接近大小上限，请先清理旧信件');
-      state.letters.unshift(blk);renderCards();
+      const make=async hab=>{const raw=await sealLetter({v:LETTER_V,id:genId(),kind,sender:letterSender(senderIdentity,hab),timestamp:nowStamp(),recipientKeys:keys,envelopeNames},payload);
+        await signLetter(raw,senderIdentity);const b=cleanLetter(raw); // 规范字段顺序（envelopeNames 紧跟 id）
+        if(est(state.letters.concat(b))>MAX_COPY)throw new Error('空间内容已接近大小上限，请先清理旧信件');
+        state.letters.unshift(b);return b};
+      const blk=await make($('cHab').checked);renderCards();
       if(kind==='text'){delete DRAFTS[key];$('cText').value='';$('cText').style.height=''} // 发出后清空输入框
       const np=partsOf(blk);if(keyOf(np)!==key){back();chatDlg(np)}else paint(); // 只发给部分成员时信件属于另一个会话：直接切过去，避免“信去哪了”
-      if(solo(blk))return;if(!await relaySend(blk))letterDlg(blk); // 先尝试经住地投递；没投完进入信息页手动发送
+      if(solo(blk)||await relaySend(blk))return;
+      let m=blk;
+      if(blk.sender.relayUrl){ // 含住地的信没投齐：退回手动，另发一封不含住地的同文信（收信人不变，新 id、新签名）；原信一封都没投出去就撤掉，不留重复
+        let b2=null;try{b2=await make(false)}catch{}
+        if(b2){m=b2;
+          if(state.handoff[blk.id]){const got=new Set((state.reads[blk.id]||{dl:[]}).dl),rest=blk.recipientKeys.filter(k=>!myKeys().has(k)&&!got.has(routeOf(k).fp||'')).map(nameOf);if(rest.length)toast('已有收信人经中转收到原信；这封不含住地的同文信请只发给：'+ell(rest.slice(0,3).join('、'),40)+(rest.length>3?` 等 ${rest.length} 位`:''))}
+          else{state.letters=state.letters.filter(x=>x!==blk);delete state.reads[blk.id]}
+          renderCards();paint(true)}
+      }
+      letterDlg(m); // 先尝试经住地投递；没投完进入信息页手动发送
     };
     $('cSend').onclick=e=>busy(e.target,async()=>{const t=$('cText').value;if(!t.trim())throw new Error('内容不能为空');if(t.length>MAX_TEXT)throw new Error(`字数超过 ${MAX_TEXT} 限制`);await doSend('text',new TextEncoder().encode(t))});
     $('cAtt').onclick=()=>$('cFile').click();
@@ -1003,7 +1018,7 @@ function addMemberDlg(parts){ // 会话由参与者集合决定：加人 = 进�
 }
 function renameDlg(parts){
   const key=keyOf(parts);
-  push(`<h3>修改群名</h3><div class="hint">名称仅保存在本地；留空恢复默认。</div><input type="text" id="rnIn" maxlength="30">
+  push(`<h3>修改会话名</h3><div class="hint">名称仅保存在本地；留空恢复默认。</div><input type="text" id="rnIn" maxlength="30">
     <div class="dialog-actions"><button class="primary" id="rnGo">保存</button><button id="rnBack">取消</button></div>`,()=>{
     const inp=$('rnIn');inp.value=(state.meta.convNames||{})[key]||'';$('rnBack').onclick=back;inp.focus();inp.onkeydown=e=>{if(e.key==='Enter')$('rnGo').click()};
     $('rnGo').onclick=()=>{const v=inp.value.trim().slice(0,30);if(!state.meta.convNames)state.meta.convNames={};if(v)state.meta.convNames[key]=v;else delete state.meta.convNames[key];back();const e=$('cTitleH');if(e)e.textContent=cut(convNameOf(parts),60);renderCards()};
@@ -1042,12 +1057,12 @@ async function relayRead(parts){ // 已读回执：打开会话时，向寄信�
     if(M.has(b.sender.encPub)||keyOf(partsOf(b))!==key)continue;const e=state.reads[b.id];if(e&&e.s)continue; // s：旧版记录，视为已发完；新版用 sd 记录已发回执的灵宠 id
     const sp=idx().identities.get(b.sender.encPub),sfp=sp?sp.id:b.sender.id,sr=relayOf(sp?sp.relayUrl:b.sender.relayUrl),sent=new Set(e&&e.sd||[]);
     if(!sfp||!sr||!relayOn(sr)||!relayDue(sr))continue;
-    for(const rp of pets){if(busyOf(rp)||!b.recipientKeys.includes(rp.encPub)||sent.has(rp.id)||(ps(rp).rt[b.id]||0)>now)continue;const gk=sr+'|'+sfp+'|'+rp.id;if(!g.has(gk))g.set(gk,{sr,sfp,rp,ids:[]});g.get(gk).ids.push(b.id)}}
+    for(const rp of pets){if(busyOf(rp,sr)||!b.recipientKeys.includes(rp.encPub)||sent.has(rp.id)||(ps(rp,sr).rt[b.id]||0)>now)continue;const gk=sr+'|'+sfp+'|'+rp.id;if(!g.has(gk))g.set(gk,{sr,sfp,rp,ids:[]});g.get(gk).ids.push(b.id)}}
   if(!g.size)return;reading=true;
-  try{for(const{sr,sfp,rp,ids}of g.values())for(let i=0;i<ids.length;i+=20){const c=ids.slice(i,i+20);if(busyOf(rp))break;
+  try{for(const{sr,sfp,rp,ids}of g.values())for(let i=0;i<ids.length;i+=20){const c=ids.slice(i,i+20);if(busyOf(rp,sr))break;
     try{const j=await relayCall(sr,'/v1/read',{to:sfp,ids:c,auth:await relayAuth(rp,'read',sfp+':'+c.join(','))});
-      if(j&&j.done){for(const id of c){const e=state.reads[id]||(state.reads[id]={dl:[],rd:[]});e.sd=[...new Set([...(e.sd||[]),rp.id])].slice(0,MAX)}touch()}else for(const id of c)ps(rp).rt[id]=Date.now()+6e5}
-    catch(e){noteBusy(rp,e)}}}
+      if(j&&j.done){for(const id of c){const e=state.reads[id]||(state.reads[id]={dl:[],rd:[]});e.sd=[...new Set([...(e.sd||[]),rp.id])].slice(0,MAX)}touch()}else for(const id of c)ps(rp,sr).rt[id]=Date.now()+6e5}
+    catch(e){noteBusy(rp,e,sr)}}}
   finally{reading=false}}
 const senderName=b=>{const p=state.identities.find(x=>x.encPub===b.sender.encPub);return p?(p.remark||p.nickname)+(p.group==='verified'&&!isOwned(p)?' v':''):b.sender.nickname}; // 本地已有的灵宠用本地名称；信里自报的昵称不可信
 
@@ -1102,29 +1117,30 @@ async function quotaCheck(p,hab){ // 向中转站查询本灵宠当前额度（�
   const r=relayOf(hab||p.relayUrl);if(!r)throw new Error('请先选择住地');if(!relayOn(r))throw new Error('中转配置中未允许该中转站');if(!isUnlocked(p))throw new Error('灵宠未解锁，无法签名查询');
   const j=await relayCall(r,'/v1/box/quota',{auth:await relayAuth(p,'quota','')});
   alert(`「${p.nickname}」中转额度\n本小时还可用：${j.room}（保底 ${j.floor}，最多可借到 ${j.cap}；本小时已用 ${j.spent}）\n本小时全站池：已用 ${j.hs} / ${j.hp}\n今日全站：已用 ${j.used} / ${j.budget}（${Math.round(j.used/j.budget*100)}%）\n活跃灵宠 ${j.active}，座位 ${j.seats}/${j.maxSeats}\n距下次补给约 ${Math.ceil(j.resetIn/60)} 分钟`)}
+const routeOf=k=>{const p=idx().identities.get(k),f=idx().sender.get(k),ff=f&&f.sender,fp=p?p.id:ff&&ff.id,raw=p?p.relayUrl:ff&&ff.relayUrl,r=relayOf(raw);return{fp,raw,r,why:!fp?'缺少指纹':!raw?'名片里没有住地':!r?'住地不在白名单内':!relayOn(r)?'中转配置中未允许该中转站':''}}; // 一位收信人能否经中转投递：为空 = 可以
+const relayOK=(f,keys)=>{const sr=f&&relayOf(f.relayUrl);if(!f||!f.relay||!sr||!relayOn(sr)||busyOf(f,sr))return false;const M=myKeys();let n=0;for(const k of keys){if(M.has(k))continue;n++;if(routeOf(k).why)return false}return n>0}; // 寄信灵宠自己的住地可用，且所有对外收信人都能经中转投递（住地在白名单内且已勾选）
 async function relaySend(b){ // 返回 true = 所有对外收件人都已投递（或没有对外收件人）；false = 需要手动发送
   if(solo(b))return true; // 收信人全是本空间的灵宠：信件已在本机，不占中转站座位和配额，也不走回执
   if(!RELAYS.length)return false;
   const sp=state.identities.find(q=>q.encPub===b.sender.encPub);if(!sp||!sp.relay)return false;
-  if(busyOf(sp)){toast('该灵宠中转繁忙，稍后再试，或手动发送');return false}
-  if(JSON.stringify(b).length>MAX_RELAY_LETTER){toast('信件较大，不经中转投递');return false}
+    if(JSON.stringify(b).length>MAX_RELAY_LETTER){toast('信件较大，不经中转投递');return false}
   const M=myKeys(),by=new Map(),why=[],done=new Set((state.reads[b.id]||{dl:[]}).dl);let total=0,pre=0; // done：之前已投递成功的收信人，重试时不重复占用对方信箱配额
   for(const k of b.recipientKeys){if(M.has(k))continue;total++;
-    const p=idx().identities.get(k),f=idx().sender.get(k),ff=f&&f.sender,fp=p?p.id:ff&&ff.id,raw=p?p.relayUrl:ff&&ff.relayUrl,r=relayOf(raw),nm=nameOf(k);
-    if(fp&&done.has(fp))pre++;
-    else if(!fp)why.push(nm+'：缺少指纹');else if(!raw)why.push(nm+'：名片里没有住地');else if(!r)why.push(nm+'：住地不在白名单内');else if(!relayOn(r))why.push(nm+'：中转配置中未允许该中转站');
-    else{if(!by.has(r))by.set(r,[]);by.get(r).push(fp)}}
+    const o=routeOf(k);
+    if(o.fp&&done.has(o.fp))pre++;
+    else if(o.why)why.push(nameOf(k)+'：'+o.why);
+    else{if(!by.has(o.r))by.set(o.r,[]);by.get(o.r).push(o.fp)}}
   if(!by.size){if(pre&&pre===total){toast('已全部投递');return true}if(total)toast('未经中转投递：'+why.slice(0,3).join('；')+(why.length>3?' 等':''));return false}
-  let ok=pre,rej=0,fl=0;const acc=[];for(const[r,fps]of by){try{const j=await relayCall(r,'/v1/drop',{letter:b,to:fps});ok+=Array.isArray(j.accepted)?j.accepted.length:0;if(Array.isArray(j.accepted))acc.push(...j.accepted.filter(x=>fps.includes(x)));rej+=Array.isArray(j.rejected)?j.rejected.length:0;fl+=Array.isArray(j.full)?j.full.length:0}catch(e){noteBusy(sp,e);why.push(r.replace(/^https:\/\//,'')+'：'+e.message)}}
+  let ok=pre,rej=0,fl=0;const acc=[];for(const[r,fps]of by){if(busyOf(sp,r)){why.push(r.replace(/^https:\/\//,'')+'：中转繁忙');continue}try{const j=await relayCall(r,'/v1/drop',{letter:b,to:fps});ok+=Array.isArray(j.accepted)?j.accepted.length:0;if(Array.isArray(j.accepted))acc.push(...j.accepted.filter(x=>fps.includes(x)));rej+=Array.isArray(j.rejected)?j.rejected.length:0;fl+=Array.isArray(j.full)?j.full.length:0}catch(e){noteBusy(sp,e,r);why.push(r.replace(/^https:\/\//,'')+'：'+e.message)}}
   if(acc.length){const e=state.reads[b.id]||(state.reads[b.id]={dl:[],rd:[]});e.dl=[...new Set([...e.dl,...acc])].slice(0,MAX);renderCards()} // 投递成功的收信人才统计已读
   if(ok>0){state.handoff[b.id]={m:'relay',at:nowStamp(),ok,of:total};lastAct=Date.now();schedulePoll();renderCards()} // 中转站接收即视为已交付
   if(ok===total){toast(`已投递 ${ok}/${total}`);return true}
   toast(`已投递 ${ok}/${total}${rej?`；${rej} 位未开通信箱或未允许你投信`:''}${fl?`；${fl} 位信箱已满`:''}${why.length?'；'+why.slice(0,2).join('；'):''}`);return false;
 }
-const busyOf=p=>!!(PS[p.id]&&PS[p.id].busy>Date.now()); // 被中转站限流的灵宠
-function noteBusy(p,e){if(!e||!e.busy)return false;const was=busyOf(p),ms=Math.min(36e5,Math.max(30,e.retry||60)*1000)*(1+Math.random()*.2);ps(p).busy=Date.now()+ms;if(!was){toast('「'+p.nickname+'」中转繁忙，稍后自动恢复');renderIdentities()}setTimeout(()=>{if(!busyOf(p))renderIdentities()},ms+500);return true}
+const busyOf=(p,r)=>{const x=PS[p.id+'|'+(r||relayOf(p.relayUrl))];return !!x&&x.busy>Date.now()}; // 灵宠在某中转站上被限流（r 缺省 = 它的住地）
+function noteBusy(p,e,r){if(!e||!e.busy)return false;r=r||relayOf(p.relayUrl);const was=busyOf(p,r),ms=Math.min(36e5,Math.max(30,e.retry||60)*1000)*(1+Math.random()*.2);ps(p,r).busy=Date.now()+ms;if(!was){toast('「'+p.nickname+'」中转繁忙，稍后自动恢复');renderIdentities()}setTimeout(()=>{if(!busyOf(p,r))renderIdentities()},ms+500);return true}
 const SEAT_RENEW_MS=4*36e5; // 座位剩余不足 4 小时才续期；须与中转站的 RENEW_LEFT_H 一致
-const PS=Object.create(null),ps=(p,r)=>{const s=PS[p.id]||(PS[p.id]={r,key:'',seat:0,block:0,busy:0,rt:{}});if(r&&s.r!==r){if(s.r)Object.assign(s,{key:'',seat:0,block:0,rt:{}});s.r=r}return s},RANK={verified:0,friend:1,member:2},SCOPES={member:'好友v / 好友 / 群友（全部联系人）',friend:'好友v / 好友',verified:'仅好友v'}; // PS：每只灵宠的中转运行态（仅内存）：r 住地，key 已同步的允许名单，seat 座位到期，block 暂停同步到，busy 被限流到，rt 回执重试时间
+const PS=Object.create(null),ps=(p,r)=>PS[p.id+'|'+r]||(PS[p.id+'|'+r]={key:'',seat:0,block:0,busy:0,rt:{}}),RANK={verified:0,friend:1,member:2},SCOPES={member:'好友v / 好友 / 群友（全部联系人）',friend:'好友v / 好友',verified:'仅好友v'}; // PS：每只灵宠在每个中转站上的运行态（仅内存，键为 灵宠id|中转站）：key 已同步的允许名单，seat 座位到期，block 暂停同步到，busy 被限流到，rt 回执重试时间
 const allowList=p=>{const sc=RANK[p.allow]??1;return state.identities.filter(q=>q!==p&&(isOwned(q)||RANK[q.group]<=sc)).map(q=>q.id).slice(0,MAX_ALLOW)}; // 允许名单：我自己的灵宠 + 不低于所选分组的联系人
 async function relaySync(p,r){ // 占座并同步允许名单；座位临近到期（或已过期）自动续；没变化不重复上传
   const l=allowList(p),key=l.join(','),s=ps(p,r),same=s.key===key;
@@ -1133,7 +1149,7 @@ async function relaySync(p,r){ // 占座并同步允许名单；座位临近到�
   try{const j=await relayCall(r,'/v1/box/allow',{list:l,renew:same,auth:await relayAuth(p,'allow',(same?1:0)+':'+key)});s.key=key;s.seat=j.exp||0}
   catch(e){if((e.status===429&&!e.busy)||e.status===503)s.block=Date.now()+18e5;throw e}}
 function relayLeave(p,r){ // 换住地 / 关中转 / 解除契约时通知原住地离座，免得别人还能向这个信箱投信；须已解锁才能签名，否则座位在不再活动后自动到期；箱里已有的信留到过期清理
-  delete PS[p.id];if(!r||!relayOn(r))return;
+  if(r)delete PS[p.id+'|'+r];if(!r||!relayOn(r))return;
   if(!isUnlocked(p)){toast('灵宠未解锁，无法通知原住地离座；座位将在不再活动后到期');return}
   relayAuth(p,'leave','').then(a=>relayCall(r,'/v1/box/leave',{auth:a})).catch(()=>{}).finally(()=>{if(!isOwned(p))delete signKeyCache[p.encPub]});
 }
@@ -1170,7 +1186,7 @@ const serialize=o=>{ // o.relays：中转白名单；其余部署参数一律置
   return h;
 };
 $('btnTpl').onclick=()=>push(`<h3>导出模板</h3><div class="hint keep">模板不含任何数据和私钥</div>
-  <label>中转白名单（可空，每行一个 https 地址；页面只能连接这些地址；不自动带入当前白名单）</label><textarea id="tpRelay" style="min-height:60px"></textarea>
+  <label>中转白名单（可空，每行一个 https 地址；页面只能连接这些地址）</label><textarea id="tpRelay" style="min-height:60px"></textarea>
   <div class="dialog-actions"><button class="primary" id="tpGo">导出</button><button id="tpBack">取消</button></div>`,()=>{
   $('tpBack').onclick=back;$('tpRelay').placeholder='https://relay.example.com';
   $('tpGo').onclick=()=>{
@@ -1277,7 +1293,7 @@ $('btnHelp').onclick=()=>push(`<h3>关于</h3>
   <li><b>换新名片</b>：在旧灵宠的“名片·操作”→“更多方式”中点“换新名片”，将生成的名片发给联系人，对方导入后自动替换。</li></ol>
   <div class="dialog-actions"><button id="hBack">返回</button></div>`,()=>{$('hBack').onclick=back});
 $('btnProto').onclick=e=>{e.preventDefault();push(`<h3>技术说明</h3><div class="content-box" style="font-family:monospace;font-size:12px">灵宠 = X25519 加密密钥对 + Ed25519 签名密钥对
-  名片 = 两个公钥（32 字节原始公钥，base64）　灵枢 = 两个私钥（JWK）
+  名片 = 两个公钥（32 字节原始公钥，base64）+ 可选 born（密钥生成时间，仅作提示，不参与指纹，不进入信件）　灵枢 = 两个私钥（JWK）
   口令保护（可选）：PBKDF2-SHA256(600000 次, 随机盐) → AES-GCM 加密两个私钥，
     以灵宠公钥作为附加认证数据；存为 sealedKeys{v,kdf,iter,salt,iv,ct}，替代明文私钥
 
@@ -1306,6 +1322,7 @@ $('btnProto').onclick=e=>{e.preventDefault();push(`<h3>技术说明</h3><div cla
   · 会话由信件的参与者集合（收件人 ∪ 寄信人）推导，不单独存储；发信时寄信人自动加入收件人
   · v 为信件协议版本（当前 1）；envelopeNames 为写到信封的收信人昵称数组（可为空；写入时含全部收信人，未知者为“？”），明文，进入 AAD 和签名；信封图片直接按它绘制
   · sender 为明文，但已纳入 AAD，第三方改动会导致解密失败；昵称与简介由寄信人自填，以公钥为准
+  · 住地（relayUrl）写不写由寄信时的“含住地”决定，写入后进入 AAD 和签名，事后不能再去掉
   · 必须签名：每封信都由寄信灵宠用 Ed25519 对“除 sig 外的整封信件”的规范化 JSON 签署，
     结果为 sig（base64），用 sender.signPub 验证；任一字段被改动都会验证失败；导入或恢复时逐封验签，缺少 sender 或 sig、验签失败的信件一律拒绝
   · 图片 = PNG 自定义数据块 lpSd，内容是上述 JSON 数组
@@ -1313,8 +1330,7 @@ $('btnProto').onclick=e=>{e.preventDefault();push(`<h3>技术说明</h3><div cla
     由公钥派生，导入时校验；昵称、简介、住地可改，id 不变。相同 id 整体覆盖
   · 信件 id 为随机数（crypto.getRandomValues，128 位）；导入时相同 id 且签名一致则忽略，
     内容不同则拒绝，不会覆盖已有信件
-  · 中转（可选）：整封信上传到收信人住地的中转站，仅存密文；占座、取信、已读回执均由灵宠的 Ed25519 签名鉴权。已读回执只含信件 id 与读者指纹。
-  · 已知限制：不支持密钥轮换与吊销，灵枢一旦泄露无法经协议通知对方，只能孵化新灵宠并重新分发名片；信件无前向保密；信件时间由寄信人自报（已签名）；寄信人、收件人公钥及昵称、简介为明文（为便于阅读，未做元数据保护）</div>
+  · 中转（可选）：整封信上传到收信人住地的中转站，仅存密文；占座、取信、已读回执均由灵宠的 Ed25519 签名鉴权。已读回执只含信件 id 与读者指纹。</div>
     ${REPO_URL?`<div class="hint keep" style="margin-top:8px">源码与部署说明：<a href="${esc(REPO_URL)}" target="_blank" rel="noopener noreferrer">${esc(REPO_URL)}</a></div>`:''}<div class="dialog-actions"><button id="prBack">返回</button></div>`,()=>{$('prBack').onclick=back},true)};
 
 /* ---------- 版本信息 / 试用灵宠 ---------- */
