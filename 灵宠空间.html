@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>灵宠空间</title>
-<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-13T00:46:38Z">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-hjmpusD+N4AFAnVvV6aQYZvP6PtA6O4csdcc/FDgvFg='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-13T01:00:20Z">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-FBJGsCIYhJ4gcCUF9a4KNKgQhVpiDSYZpVXbLv2Pu+w='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <style>
 :root{--bg:#f5f5f4;--panel:#fff;--border:#e0ddd6;--text:#2a2823;--muted:#6f6c63;--accent:#3c6e5c;--danger:#b3452f;--warn:#8a5a1f}
 *{box-sizing:border-box}
@@ -135,7 +135,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
 <!-- 部署配置（部署脚本只需改写下面的 JSON，请勿改动其他脚本内容，否则 CSP 哈希失效）：bulletinUrl / bulletinExpires 张贴栏链接（https）及有效期 YYYY-MM-DD，过期后自动不显示；repoUrl 源码仓库链接（https，可空，显示在页脚和技术说明）；contactUrl “联系我”页面的链接（https，作者的灵宠名片），contactId 该灵宠的 id（可空）；relays 中转白名单（https，须与 CSP 的 connect-src 一致，建议用“导出模板”生成）。 -->
 <script id="deploy-config" type="application/json">{"bulletinUrl":"","bulletinExpires":"","contactUrl":"","contactId":"","repoUrl":"https://github.com/llzz12321/spirit-pet-relay"}</script>
 <script id="container-json" type="application/json">
-{"meta":{"spaceName":"灵宠空间","version":"0.30.13"},"identities":[],"letters":[]}
+{"meta":{"spaceName":"灵宠空间","version":"0.30.14"},"identities":[],"letters":[]}
 </script>
 
 <script>
@@ -151,7 +151,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
    中转开关：identity.relay（仅本地；启用后经住地中转站收发信件和回执；与口令锁定无关）
    未读：state.reads[信件id].n = 1（新收到、尚未打开会话；用于红点）
    信件字段：sender（寄信人）、kind（text / file）*/
-const VERSION='0.30.13';
+const VERSION='0.30.14';
 const DATA_SCHEMA=1,LETTER_V=1,SEAL_V=1; // 数据结构版本（备份文件/本地库）、信件协议版本（信件字段 v，进入签名和 AAD）、口令封装版本（sealedKeys.v）。高于本页支持的一律拒绝并提示升级；低于的经 migrate() 逐级升级
 const migrate=d=>d; // 备份文件 schema 低于 DATA_SCHEMA 时在此逐级升级（目前为空）
 const ID_RE=/^id_[0-9a-f]{32}$/; // 灵宠 id 与信件 id 的统一格式
@@ -482,6 +482,13 @@ function wireShare(btn,data,name,type,onOk){ // 系统分享走文件通道：�
   try{const f=new File([data],name,{type:type||'image/png'});if(!(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})))return;
     btn.style.display='';btn.onclick=()=>navigator.share({files:[f]}).then(()=>{if(onOk)onOk()}).catch(e=>{if(!e||e.name!=='AbortError')alert('分享失败，请改用“保存”')})}catch{}
 }
+async function pdfDlg(title,kind,obj,name,payload,onShared){ // PDF 预览窗：预览整页内容，再分享或保存
+  const pdf=await makePdf(kind,obj,payload),c=kind==='card'?drawCard(obj):drawEnvelope(obj),pb=await new Promise(r=>c.toBlob(r,'image/png'));if(!pb)throw new Error('生成预览失败');
+  push(`<h3>${title}</h3><div id="ipv" class="pv"></div><div class="dialog-actions"><button class="primary" id="pShare" style="display:none">分享</button><button class="primary" id="pSave">保存</button><button id="pBack">返回</button></div>`,()=>{
+    const u=URL.createObjectURL(pb);activeUrls.push(u);$('ipv').innerHTML=`<img class="ns" src="${u}" alt="">`;
+    wireShare($('pShare'),pdf,name,'application/pdf',onShared);$('pSave').onclick=()=>dl(name,pdf,'application/pdf');$('pBack').onclick=back;
+  },true);
+}
 async function imgDlg(title,kind,obj,name,payload,onShared){ // 图片预览窗：保存/下载
   const png=await makePng(kind,obj,payload);
   push(`<h3>${title}</h3><div id="ipv" class="pv"></div><div class="tip-blue dflt">${IMG_TIP}</div>
@@ -491,7 +498,7 @@ async function imgDlg(title,kind,obj,name,payload,onShared){ // 图片预览窗�
     $('iSave').onclick=()=>dl(name,png,'image/png');$('iBack').onclick=back;
   },true);
 }
-const identityDlg=p=>rawModal([{...identityData(p,false),relayUrl:''}],`名片_${safeName(p.nickname)}.txt`,'名片·操作','名片可发给联系人。'+bulletinHint(),(n,h)=>imgDlg('名片图片','card',h?p:{...p,relayUrl:''},`${n}.png`,{...identityData(p,false),relayUrl:h?(p.relayUrl||''):''}),IMG_BTN,null,false,isOwned(p)?()=>editDlg(p):null,[{t:'备注',f:()=>remarkDlg(p)},...(!isOwned(p)&&RELAYS.length?[{t:'住地',f:()=>relayDlg(p)}]:[]),...(isUnlocked(p)?[{t:'换新名片',f:()=>migDlg(p)}]:[])],h=>[{...identityData(p,false),relayUrl:h?(p.relayUrl||''):''}],h=>makePdf('card',h?p:{...p,relayUrl:''},{...identityData(p,false),relayUrl:h?(p.relayUrl||''):''}));
+const identityDlg=p=>rawModal([{...identityData(p,false),relayUrl:''}],`名片_${safeName(p.nickname)}.txt`,'名片·操作','名片可发给联系人。'+bulletinHint(),(n,h)=>imgDlg('名片图片','card',h?p:{...p,relayUrl:''},`${n}.png`,{...identityData(p,false),relayUrl:h?(p.relayUrl||''):''}),IMG_BTN,null,false,isOwned(p)?()=>editDlg(p):null,[{t:'备注',f:()=>remarkDlg(p)},...(!isOwned(p)&&RELAYS.length?[{t:'住地',f:()=>relayDlg(p)}]:[]),...(isUnlocked(p)?[{t:'换新名片',f:()=>migDlg(p)}]:[])],h=>[{...identityData(p,false),relayUrl:h?(p.relayUrl||''):''}],(n,h)=>pdfDlg('名片PDF','card',h?p:{...p,relayUrl:''},`${n}.pdf`,{...identityData(p,false),relayUrl:h?(p.relayUrl||''):''}));
 // 可选签名：每只灵宠另有一对独立的 Ed25519 签名密钥（与加密用的 X25519 密钥分离）
 const ECK={name:'Ed25519'},ECS=ECK; // 签名：Ed25519
 const impVerify=b64=>crypto.subtle.importKey('raw',b642ab(b64),ECK,false,['verify']);
@@ -526,7 +533,7 @@ function senderDlg(b){
   });
 }
 const est1=b=>b.ciphertext.length+b.wrapped.length*150+2000,est=bs=>bs.reduce((n,b)=>n+est1(b),0)+200000; // 估算副本大小
-async function letterDlg(b){const mk=m=>{if(myKeys().has(b.sender.encPub)){state.handoff[b.id]={m:m==='copy'?'copy':'share',at:nowStamp()};renderCards()}};rawModal([b],await letterFileName(b),'邮寄信件','复制或分享调用成功后记为“已交付”；其他方式请在会话中手动标记。',n=>imgDlg('信件图片','env',b,`${n}.png`,b,mk),IMG_BTN,mk,true,null,null,null,()=>makePdf('env',b,b))}
+async function letterDlg(b){const mk=m=>{if(myKeys().has(b.sender.encPub)){state.handoff[b.id]={m:m==='copy'?'copy':'share',at:nowStamp()};renderCards()}};rawModal([b],await letterFileName(b),'邮寄信件','复制或分享调用成功后记为“已交付”；其他方式请在会话中手动标记。',n=>imgDlg('信件图片','env',b,`${n}.png`,b,mk),IMG_BTN,mk,true,null,null,null,n=>pdfDlg('信件PDF','env',b,`${n}.pdf`,b,mk))}
 
 /* ---------- 弹窗（带返回栈） ---------- */
 let stack=[],opener=null,hasH=false,skipPop=false;
@@ -560,15 +567,15 @@ function rawModal(arr,name,title,hint,img,imgLabel,onShared,warn,edit,extra,hab,
   const fmt=pr=>JSON.stringify(hab?hab(H):arr,null,pr?2:0);let s=fmt(false);const base0=name.replace(/\.txt$/,''); // 默认紧缩；导入时 JSON.parse 两种格式都能读
   push(`<h3>${title||'原始数据'}</h3>${hint?`<div class="hint">${hint}</div>`:''}<div class="warn-line" id="rWarn" style="display:none;margin:0 0 8px"></div><div class="row" style="justify-content:flex-end;gap:14px;margin:0 0 4px">${hab?'<label class="key-check" id="rHabL"><input type="checkbox" id="rHab"> 含住地</label>':''}<label class="key-check"><input type="checkbox" id="rPre"> 美化</label></div><div class="content-box" id="rBox" style="max-height:300px;overflow:auto"></div>
     <div class="hint">文件名可修改（自动加 .txt），图片沿用同名。</div><div class="mrow"><div style="flex:1;min-width:0;overflow:hidden"><input type="text" id="rName" maxlength="80" aria-label="文件名"></div><span class="sub" style="flex-shrink:0;margin-left:-4px">.txt</span></div>
-    <div class="dialog-actions"><button class="primary" id="rCopy">复制</button><button class="primary" id="rShare" style="display:none">分享(txt)</button>${pdf?'<button class="primary" id="rShareP" style="display:none">分享(pdf)</button>':''}<button id="rBack">返回</button></div><details class="more"><summary>更多方式</summary><div class="row bar"><button id="rExp">导出</button>${img?`<button id="rImg">${imgLabel||'导出图片'}</button>`:''}${edit?'<button id="rEdit">编辑</button>':''}${(extra||[]).map((x,i)=>`<button id="rX${i}">${x.t}</button>`).join('')}</div></details>`,()=>{
-    const fn=()=>safeName($('rName').value).replace(/\.(txt|png|pdf)$/i,'').slice(0,80)||base0,show=()=>{$('rBox').textContent=s.length>20000?s.slice(0,20000)+'\n…（数据较大，仅显示前一部分，完整内容请导出）':s;wireShare($('rShare'),s,fn()+'.txt','text/plain',onShared);if(pdf){const sp=$('rShareP');sp.style.display='none';const tk=++pt;pdf(H).then(d=>{if(tk===pt&&$('rShareP'))wireShare($('rShareP'),d,fn()+'.pdf','application/pdf',onShared)}).catch(()=>{})}
+    <div class="dialog-actions"><button class="primary" id="rCopy">复制</button><button class="primary" id="rShare" style="display:none">分享(txt)</button>${pdf?'<button class="primary" id="rShareP">分享(pdf)</button>':''}<button id="rBack">返回</button></div><details class="more"><summary>更多方式</summary><div class="row bar"><button id="rExp">导出</button>${img?`<button id="rImg">${imgLabel||'导出图片'}</button>`:''}${edit?'<button id="rEdit">编辑</button>':''}${(extra||[]).map((x,i)=>`<button id="rX${i}">${x.t}</button>`).join('')}</div></details>`,()=>{
+    const fn=()=>safeName($('rName').value).replace(/\.(txt|png|pdf)$/i,'').slice(0,80)||base0,show=()=>{$('rBox').textContent=s.length>20000?s.slice(0,20000)+'\n…（数据较大，仅显示前一部分，完整内容请导出）':s;wireShare($('rShare'),s,fn()+'.txt','text/plain',onShared);
       const w=$('rWarn'),big=s.length>COPY_MAX;$('rCopy').disabled=big; // 过长时停用复制：部分系统会截断剪贴板内容
       if(big){w.style.display='';w.innerHTML=`内容过长（约 ${s.length} 字符），已停用复制，请使用“分享(txt)”或“导出”`}
       else if(warn&&s.length>LONG_JSON){w.style.display='';w.innerHTML=`内容较长（约 ${s.length} 字符），建议使用“分享(txt)”或“导出”`}
       else w.style.display='none'};
     
     $('rName').value=base0;$('rName').onchange=()=>{$('rName').value=fn();show()};const rb=()=>{s=fmt($('rPre').checked);show()};$('rPre').onchange=rb;if(hab){const hc=$('rHab');if(JSON.stringify(hab(true))===JSON.stringify(hab(false))){hc.disabled=true;$('rHabL').title='没有可包含的住地'}hc.onchange=()=>{H=hc.checked;rb()}}show();
-    $('rCopy').onclick=async()=>{if(await copy(s)&&onShared)onShared('copy')};if(img)$('rImg').onclick=e=>busy(e.target,async()=>{await img(fn(),H)});$('rExp').onclick=()=>dl(fn()+'.txt',s,'text/plain');$('rBack').onclick=back;if(edit)$('rEdit').onclick=edit;(extra||[]).forEach((x,i)=>{$('rX'+i).onclick=x.f});
+    $('rCopy').onclick=async()=>{if(await copy(s)&&onShared)onShared('copy')};if(img)$('rImg').onclick=e=>busy(e.target,async()=>{await img(fn(),H)});if(pdf)$('rShareP').onclick=e=>busy(e.target,async()=>{await pdf(fn(),H)});$('rExp').onclick=()=>dl(fn()+'.txt',s,'text/plain');$('rBack').onclick=back;if(edit)$('rEdit').onclick=edit;(extra||[]).forEach((x,i)=>{$('rX'+i).onclick=x.f});
   });
 }
 // 通用导入框：粘贴 / 导入文件 两个标签；handler 返回结果提示文字
@@ -939,7 +946,7 @@ function chatDlg(parts){
   const key=keyOf(parts),m=myKeys();
   const arch=!parts.some(k=>m.has(k)),my=arch?[]:state.identities.filter(p=>isUnlocked(p)&&parts.includes(p.encPub)); // 会话至少 1 个成员，一对一也是群会话；arch：会话里没有自己的灵宠，只读
   const menu=`<div id="cMenu" class="cmenu" style="display:none"><button id="cRen">修改会话名</button><button id="cExp">导出本会话</button><button id="cGrp">导出群名片</button>${arch?'':'<button id="cAddM">添加成员</button>'}<button id="cDel" class="danger-text">删除会话</button></div>`;
-  const cmp=my.length?`<div class="comp"><div class="mrow"><button type="button" class="tg" id="cSenderT"></button><button type="button" class="tg" id="cMemT"></button></div><div class="mrow" style="justify-content:flex-end;gap:18px;margin:2px 0 10px"><label class="key-check" style="margin-left:0;padding:2px 0" title="成员昵称将明文写入信件"><input type="checkbox" id="cEnv" checked> 写信封</label><label class="key-check" style="margin-left:0;padding:2px 0" title="把你的住地写进信件，对方才能经中转回执、回信"><input type="checkbox" id="cHab"> 含住地</label></div><div id="cSenderBox" class="pick" style="display:none">${my.map((p,i)=>`<label class="key-check"><input type="radio" name="cSenderR" value="${esc(p.id)}"${i?'':' checked'}> ${whoOf(p.encPub)}</label>`).join('')}</div><div id="cKeys" class="pick" style="display:none"><div class="sub" style="margin:2px 0">默认发给全部成员；只选部分成员时，信件归入仅含所选成员的会话。</div>${parts.map(k=>`<label class="key-check"><input type="checkbox" value="${esc(k)}" checked> ${whoOf(k)}</label>`).join('')}</div><div class="inrow"><button id="cAtt" title="附件（5MB 内随信发送；5~50MB 为大文件，单独保存）">📎</button><textarea id="cText" rows="1" placeholder="输入内容（加密发送）"></textarea><button class="primary" id="cSend">邮寄</button><input type="file" id="cFile" style="display:none"></div><div class="hint">“邮寄”加密并签名生成信件；${my.some(p=>p.relay)?'启用中转的灵宠且中转站被允许时自动投递，否则在弹出窗口中复制或分享。':'在弹出窗口中复制或分享。'}<br>“写信封”将成员昵称以明文写入信件；“含住地”把你的住地写入信件（签名后不能再去掉），对方才能经中转回执、回信；仅当全部对方都能经中转投递时默认勾选，投不齐会另发一封不含住地的同文信供手动发送。<br>附件：≤5MB 随信发送；5~50MB 为大文件，单独保存。</div></div>`:`<div class="warn-line">${arch?'会话中已无你的灵宠，无法解读和发信，仅可导出或删除。':'无可用于发信的灵宠（需已建立契约并解锁）。'}</div>`;
+  const cmp=my.length?`<div class="comp"><div class="mrow" style="justify-content:flex-end;gap:18px;margin:0 0 4px"><label class="key-check" style="margin-left:0;padding:2px 0" title="成员昵称将明文写入信件"><input type="checkbox" id="cEnv" checked> 写信封</label><label class="key-check" style="margin-left:0;padding:2px 0" title="把你的住地写进信件，对方才能经中转回执、回信"><input type="checkbox" id="cHab"> 含住地</label></div><div class="mrow"><button type="button" class="tg" id="cSenderT"></button><button type="button" class="tg" id="cMemT"></button></div><div id="cSenderBox" class="pick" style="display:none">${my.map((p,i)=>`<label class="key-check"><input type="radio" name="cSenderR" value="${esc(p.id)}"${i?'':' checked'}> ${whoOf(p.encPub)}</label>`).join('')}</div><div id="cKeys" class="pick" style="display:none"><div class="sub" style="margin:2px 0">默认发给全部成员；只选部分成员时，信件归入仅含所选成员的会话。</div>${parts.map(k=>`<label class="key-check"><input type="checkbox" value="${esc(k)}" checked> ${whoOf(k)}</label>`).join('')}</div><div class="inrow"><button id="cAtt" title="附件（5MB 内随信发送；5~50MB 为大文件，单独保存）">📎</button><textarea id="cText" rows="1" placeholder="输入内容（加密发送）"></textarea><button class="primary" id="cSend">邮寄</button><input type="file" id="cFile" style="display:none"></div><div class="hint">“邮寄”加密并签名生成信件；${my.some(p=>p.relay)?'启用中转的灵宠且中转站被允许时自动投递，否则在弹出窗口中复制或分享。':'在弹出窗口中复制或分享。'}<br>“写信封”将成员昵称以明文写入信件；“含住地”把你的住地写入信件（签名后不能再去掉），对方才能经中转回执、回信；仅当全部对方都能经中转投递时默认勾选，投不齐会另发一封不含住地的同文信供手动发送。<br>附件：≤5MB 随信发送；5~50MB 为大文件，单独保存。</div></div>`:`<div class="warn-line">${arch?'会话中已无你的灵宠，无法解读和发信，仅可导出或删除。':'无可用于发信的灵宠（需已建立契约并解锁）。'}</div>`;
   push(`<div class="cw"><h3 class="ch"><button class="ib" id="cBack" title="返回"><svg width="10" height="18" viewBox="0 0 10 18" aria-hidden="true"><path d="M8 1.5L2 9l6 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span id="cTitleH">${esc(cut(convNameOf(parts),60))}</span><button class="ib" id="cMore" title="更多">⋮</button></h3>${menu}${relHtml}<div id="tl" class="tl"></div>${cmp}</div>`,()=>{
     const tl=$('tl'),list=()=>(convs().find(c=>c.k===key)||{list:[]}).list;
     let selId=null;const paint=(keep)=>{const st=tl.scrollTop,atBot=tl.scrollHeight-st-tl.clientHeight<40,fx=()=>{if(!keep||atBot)tl.scrollTop=tl.scrollHeight};{const e=$('cTitleH');if(e)e.textContent=cut(convNameOf(parts),60)}
