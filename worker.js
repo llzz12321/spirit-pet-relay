@@ -17,22 +17,24 @@ const MAX_SEATS=50, SEAT_MIN_H=24, SEAT_MAX_H=48, TIGHT_MIN_H=6, TIGHT_MAX_H=12,
 const IDLE_RENEW_D=7, DAY_BUDGET=50000, MIN_ACTIVE=5, BORROW=3, ACTIVE_MS=15*6e4, SOFT_PER_MIN=40, DROP_COST=5;
 const num=(v,d)=>Number.isFinite(+v)&&+v>0?+v:d;
 const ID_RE=/^id_[0-9a-f]{32}$/;
+const SUITES=['c1','h1']; // 密码套件，须与页面一致；写入指纹派生，未知套件一律拒绝（h1 另带 KEM 公钥（MLKEM768-X25519） kemPub，进入指纹）
 const CORS={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type','Access-Control-Max-Age':'86400'};
 const reply=(s,st=200)=>new Response(typeof s==='string'?s:JSON.stringify(s),{status:st,headers:{...CORS,'Content-Type':'application/json'}});
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const str=(v,n)=>typeof v==='string'&&v.length>0&&v.length<=n;
+const suiteOk=(u,x)=>SUITES.includes(u)&&(u==='h1'?str(x,2000):x===undefined);
 const idList=(a,n)=>Array.isArray(a)&&a.length>0&&a.length<=n&&a.every(x=>typeof x==='string'&&ID_RE.test(x));
 const hex=u=>[...new Uint8Array(u)].map(x=>x.toString(16).padStart(2,'0')).join('');
 const sha=async t=>crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));
-const fpOf=async(e,s)=>'id_'+hex((await sha('spirit-pet-space/pet-id/v2\n'+e+'\n'+s)).slice(0,16)); // 与客户端 fingerprintOf() 一致
+const fpOf=async(e,s,u,x)=>'id_'+hex((await sha('spirit-pet-space/pet-id/v3\n'+u+'\n'+e+'\n'+s+(u==='h1'?'\n'+x:''))).slice(0,16)); // 与客户端 fingerprintOf() 一致
 const canon=v=>Array.isArray(v)?'['+v.map(canon).join(',')+']':(v&&typeof v==='object')?'{'+Object.keys(v).filter(k=>v[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+canon(v[k])).join(',')+'}':JSON.stringify(v); // 与客户端 canon 一致
 async function senderOf(L){ // 验信件签名，返回寄信人指纹；签名不对返回 null
-  try{const f=L.sender;if(!f||!str(f.encPub,100)||!str(f.signPub,100)||!str(L.sig,200))return null;
+  try{const f=L.sender;if(!f||!suiteOk(f.suite,f.kemPub)||!str(f.encPub,100)||!str(f.signPub,100)||!str(L.sig,200))return null;
     const r={...L};delete r.sig;const k=await crypto.subtle.importKey('raw',b64(f.signPub),{name:'Ed25519'},false,['verify']);
-    return await crypto.subtle.verify({name:'Ed25519'},k,b64(L.sig),new TextEncoder().encode('spirit-pet-space/sig/v2\n'+canon(r)))?await fpOf(f.encPub,f.signPub):null}catch{return null}}
+    return await crypto.subtle.verify({name:'Ed25519'},k,b64(L.sig),new TextEncoder().encode('spirit-pet-space/sig/v2\n'+canon(r)))?await fpOf(f.encPub,f.signPub,f.suite,f.kemPub):null}catch{return null}}
 async function auth(op,a,extra){ // 验请求签名：签名覆盖 操作+指纹+时间戳+参数
-  try{if(!a||!str(a.encPub,100)||!str(a.signPub,100)||!str(a.sig,200)||!Number.isFinite(a.ts)||Math.abs(Date.now()-a.ts)>SKEW)return null;
-    const fp=await fpOf(a.encPub,a.signPub),k=await crypto.subtle.importKey('raw',b64(a.signPub),{name:'Ed25519'},false,['verify']);
+  try{if(!a||!suiteOk(a.suite,a.kemPub)||!str(a.encPub,100)||!str(a.signPub,100)||!str(a.sig,200)||!Number.isFinite(a.ts)||Math.abs(Date.now()-a.ts)>SKEW)return null;
+    const fp=await fpOf(a.encPub,a.signPub,a.suite,a.kemPub),k=await crypto.subtle.importKey('raw',b64(a.signPub),{name:'Ed25519'},false,['verify']);
     return await crypto.subtle.verify({name:'Ed25519'},k,b64(a.sig),new TextEncoder().encode(`spirit-pet-space/relay/v1\n${op}\n${fp}\n${a.ts}\n${extra}`))?fp:null}catch{return null}}
 
 export class Relay extends DurableObject{
