@@ -124,6 +124,7 @@ const handle=async(req,env)=>{
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers:CORS});
   if(req.method!=='POST')return reply({error:'method'},405);
   let b;try{const t=await req.text();if(t.length>MAX_BODY)return reply({error:'too large'},413);b=JSON.parse(t)}catch{return reply({error:'bad json'},400)}
+  if(!b||typeof b!=='object')return reply({error:'bad json'},400);
   const path=new URL(req.url).pathname,stub=env.RELAY.get(env.RELAY.idFromName('main')),out=r=>reply(r[1],r[0]);
   if(path==='/v1/drop'){ // 投信：{letter, to:[指纹...]}
     const L=b&&b.letter;
