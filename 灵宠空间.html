@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>灵宠空间</title>
-<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-15T15:00:00Z">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-TjN5fopNGuVPv2XrB3HRHvVca1ydqYbmPMEW2NdJnys='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src https:; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-15T18:00:00Z">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-zP53jgzhHJ1V3vPcX9jpsguRlj1upJBSm4FZjXeTp+Y='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src https:; form-action 'none'; base-uri 'none'">
 <style>
 :root{--bg:#f5f5f4;--panel:#fff;--border:#e0ddd6;--text:#2a2823;--muted:#6f6c63;--accent:#3c6e5c;--danger:#b3452f;--warn:#8a5a1f}
 *{box-sizing:border-box}
@@ -135,7 +135,7 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
 <!-- 部署配置（部署脚本只需改写下面的 JSON，请勿改动其他脚本内容，否则 CSP 哈希失效）：bulletinUrl / bulletinExpires 张贴栏链接（https）及有效期 YYYY-MM-DD，过期后自动不显示；repoUrl 源码仓库链接（https，可空，显示在页脚和技术说明）；contactUrl “联系我”页面的链接（https，作者的灵宠名片），contactId 该灵宠的 id（可空）；relays 中转白名单（https，须与 CSP 的 connect-src 一致，建议用“导出模板”生成）。 -->
 <script id="deploy-config" type="application/json">{"bulletinUrl":"","bulletinExpires":"","contactUrl":"","contactId":"","repoUrl":"https://github.com/llzz12321/spirit-pet-relay"}</script>
 <script id="container-json" type="application/json">
-{"meta":{"spaceName":"灵宠空间","version":"0.30.24"},"identities":[],"letters":[]}
+{"meta":{"spaceName":"灵宠空间","version":"0.30.25"},"identities":[],"letters":[]}
 </script>
 
 <script>
@@ -146,14 +146,13 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;font-size:12.5px
    信件 ↔ letter：state.letters[]，加密并签名；envelopeNames = 信封上的收信人昵称（仅展示），recipientKeys = 收件人加密公钥；readerOf(b) 找到能读它的灵宠
    会话 ↔ conversation：不单独存储，由信件的参与者集合（收件人 ∪ 寄信人）推导，会话键 = 排序后的公钥用 | 连接；自定义会话名存 state.meta.convNames
    交付 ↔ handoff：state.handoff{信件id:{m:share|copy|manual|relay,at}}，仅本地标记“已交给传输通道”（复制/分享/手动，或经中转站投递）
-   回执 ↔ reads：state.reads{信件id:{dl:[已投递到中转站的收信人指纹],rd:[已读的收信人指纹],s:1 = 我已为这封收到的信发过已读回执,rr:{at,r:{收信人公钥:结果码}} = 最近一次经中转投递的逐位结果}}，仅本地
+   回执 ↔ reads：state.reads{信件id:{dl:[已投递到中转站的收信人指纹],rd:[已读的收信人指纹],sd = 已为这封收到的信发过已读回执的我的灵宠指纹,rr:{at,r:{收信人公钥:结果码}} = 最近一次经中转投递的逐位结果}}，仅本地
    中转 ↔ relay：见“中转”一节
    中转开关：identity.relay（仅本地；启用后经住地中转站收发信件和回执；与口令锁定无关）
    未读：state.reads[信件id].n = 1（新收到、尚未打开会话；用于红点）
    信件字段：sender（寄信人：id / 昵称 / 公钥，明文）、kind（text / file）；寄信人的 about 和住地（relayUrl）在加密内容的头部，解密后缓存在 PROF（仅内存）*/
-const VERSION='0.30.24';
-const DATA_SCHEMA=1,LETTER_V=1,SEAL_V=1; // 数据结构版本（备份文件/本地库）、信件协议版本（信件字段 v，进入签名和 AAD）、口令封装版本（sealedKeys.v）。高于本页支持的一律拒绝并提示升级；低于的经 migrate() 逐级升级
-const migrate=d=>d; // 备份文件 schema 低于 DATA_SCHEMA 时在此逐级升级（目前为空）
+const VERSION='0.30.25';
+const DATA_SCHEMA=1,LETTER_V=1,SEAL_V=1; // 数据结构版本（备份文件/本地库）、信件协议版本（信件字段 v，进入签名和 AAD）、口令封装版本（sealedKeys.v）。高于本页支持的一律拒绝并提示升级
 const ID_RE=/^id_[0-9a-f]{32}$/;
 const SUITE='c1',SUITES=['c1','h1'],KEM={name:'MLKEM768-X25519'},KEM_PUB=1216; // 密码套件：c1 = X25519 + Ed25519 + AES-256-GCM + HKDF-SHA256；h1（实验）= c1 + MLKEM768-X25519 混合封装（ML-KEM-768 + X25519，浏览器原生）。写入指纹、名片、sender、信件字段和 AAD；未知套件一律拒绝并提示升级，不降级 // 灵宠 id 与信件 id 的统一格式
 const MAX_RELAY=4,relayN=()=>state.identities.filter(p=>p.relay).length; // 同时启用中转的灵宠上限（占服务端座位和轮询读取）；只在“启用中转”和“恢复数据”两处卡住
@@ -186,7 +185,7 @@ const validLetter=b=>b&&b.v===LETTER_V&&SUITES.includes(b.suite)&&Array.isArray(
 const cleanLetter=b=>({v:b.v,suite:b.suite,id:b.id,envelopeNames:b.envelopeNames.slice(),kind:b.kind,sender:{id:b.sender.id,nickname:b.sender.nickname,suite:b.sender.suite,...(b.sender.kemPub?{kemPub:b.sender.kemPub}:{}),encPub:b.sender.encPub,signPub:b.sender.signPub},timestamp:b.timestamp,recipientKeys:b.recipientKeys,ephPub:b.ephPub,iv:b.iv,ciphertext:b.ciphertext,wrapped:b.wrapped.map(w=>({encPub:w.encPub,...(w.kemCt?{kemCt:w.kemCt}:{}),wrappedKey:w.wrappedKey})),sig:b.sig}); // envelopeNames 紧跟 id：文本开头即可看到收信名单
 const RR_CODES={ok:'已投递',rej:'未开通信箱，或未允许你投信',full:'信箱已满',noaddr:'没有对方的住地',noallow:'对方住地无效，或尚未放行该中转站',big:'附件大于 1 MB，不经中转',busy:'中转繁忙',err:'投递失败'}; // 中转投递的逐位结果码
 const cleanRR=v=>{if(!v||typeof v!=='object'||!S(v.at,40)||!v.r||typeof v.r!=='object')return{};const r={};for(const k of Object.keys(v.r).slice(0,MAX))if(k.length<=100&&RR_CODES[v.r[k]])r[k]=v.r[k];return Object.keys(r).length?{rr:{at:v.at,r}}:{}};
-const cleanReads=v=>{const f=a=>Array.isArray(a)?[...new Set(a.filter(x=>typeof x==='string'&&ID_RE.test(x)))].slice(0,MAX):[];return{dl:f(v&&v.dl),rd:f(v&&v.rd),...(v&&v.s===1?{s:1}:{}),...(v&&Array.isArray(v.sd)&&v.sd.length?{sd:f(v.sd)}:{}),...(v&&v.n===1?{n:1}:{}),...cleanRR(v&&v.rr)}}; // 已读回执记录
+const cleanReads=v=>{const f=a=>Array.isArray(a)?[...new Set(a.filter(x=>typeof x==='string'&&ID_RE.test(x)))].slice(0,MAX):[];return{dl:f(v&&v.dl),rd:f(v&&v.rd),...(v&&Array.isArray(v.sd)&&v.sd.length?{sd:f(v.sd)}:{}),...(v&&v.n===1?{n:1}:{}),...cleanRR(v&&v.rr)}}; // 已读回执记录
 const cleanHandoff=v=>v&&typeof v==='object'&&['share','copy','manual','relay'].includes(v.m)&&S(v.at,40)?{m:v.m,at:v.at,...(Number.isInteger(v.ok)&&Number.isInteger(v.of)?{ok:v.ok,of:v.of}:{})}:1; // 邮寄记录：最后一次成功的复制/分享（或手动标记）；旧数据为 1
 function normalize(d){ // 校验并规范化来自 HTML 的数据（初始数据与载入副本共用）
   let rc=0;const identities=(d.identities||[]).filter(validIdentity).filter((p,i,a)=>a.findIndex(q=>q.encPub===p.encPub||q.id===p.id)===i).slice(0,MAX_IDENTITIES).map(p=>{
@@ -211,7 +210,7 @@ function normalize(d){ // 校验并规范化来自 HTML 的数据（初始数据
 }
 let state=normalize(initial);
 state.meta.version=VERSION;
-let IDX=null,CVC=null,saveFail=false,activeUrls=[],dirty=false,prevVer='',newer=false,archOpen=false,lastImport={keys:[],bad:0};
+let IDX=null,CVC=null,saveFail=false,activeUrls=[],dirty=false,newer=false,archOpen=false,lastImport={keys:[],bad:0};
 const encKeyCache=Object.create(null),signKeyCache=Object.create(null); // 私钥 CryptoKey 缓存（公钥 -> CryptoKey）：加密用 / 签名用，仅在内存
 
 /* ---------- 存储：https 用 IndexedDB 自动保存；file/content 仅内存 ---------- */
@@ -576,7 +575,7 @@ function importDlg(title,hint,handler,jsonOnly,startTab,after){
       else{const f=$('iFile').files[0];if(!f)throw new Error('请选择文件');if(f.size>MAX_IMPORT)throw new Error('文件过大');raw=await readFileData(f,!jsonOnly)}
       if(raw.length>MAX_IMPORT)throw new Error('内容过长');
       let data;try{data=JSON.parse(raw)}catch{throw new Error('不是有效的 JSON')}
-      if(!Array.isArray(data))throw new Error('格式错误：应为数组（单个对象的旧格式不再支持）');
+      if(!Array.isArray(data))throw new Error('格式错误：应为数组');
       const msg=await handler(data);
       renderAll();closeAll();if(after)after(msg);else alert(msg);
     });
@@ -909,6 +908,18 @@ function bigPick(b,bt){const i=document.createElement('input');i.type='file';i.s
   try{pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:u.subarray(0,12),additionalData:BIGAAD},await crypto.subtle.importKey('raw',b642ab(m[1]),'AES-GCM',false,['decrypt']),u.subarray(12))}catch{throw new Error('解密失败：不是这封信对应的文件，或文件已损坏')}
   const r=unpackFile(pt);openPreview({kind:'file',title:r.meta.filename,fileMeta:r.meta},r.bytes);
 })};i.click()}
+const IMG_TARGET=900*1024,imgBig=f=>/^image\/(jpeg|png|webp|bmp|avif)$/i.test(f.type)&&f.size>IMG_TARGET; // 经中转的信件 JSON 上限约 1.45MB（附件约 1MB），留出余量
+async function shrinkImg(f){ // 缩小并重编码为 JPEG（同时去掉 EXIF 里的位置等信息）；逐级降低分辨率和质量，直到不超过目标大小
+  let im;try{im=await createImageBitmap(f)}catch{im=await new Promise((ok,no)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{URL.revokeObjectURL(u);ok(i)};i.onerror=()=>{URL.revokeObjectURL(u);no(new Error('无法解码'))};i.src=u})}
+  let best=null;
+  for(const[e,q]of[[2560,.85],[2048,.8],[1600,.75],[1280,.7],[1024,.65],[800,.6]]){
+    const s=Math.min(1,e/Math.max(im.width,im.height)),w=Math.max(1,Math.round(im.width*s)),ht=Math.max(1,Math.round(im.height*s)),c=document.createElement('canvas');c.width=w;c.height=ht;
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,ht);x.drawImage(im,0,0,w,ht); // 透明背景填白
+    const b=await new Promise(r=>c.toBlob(r,'image/jpeg',q));if(!b)continue;best={b,w,h:ht};if(b.size<=IMG_TARGET)break}
+  if(im.close)im.close();if(!best)throw new Error('压缩失败');
+  return{file:new File([best.b],f.name.replace(/\.[^.]*$/,'')+'.jpg',{type:'image/jpeg'}),w:best.w,h:best.h}}
+function imgDlg(f,c,go){push(`<h3>图片较大</h3><div class="content-box">原图 ${fmtSize(f.size)}\n压缩后 ${fmtSize(c.file.size)}（${c.w}×${c.h}）</div><div class="hint keep">经中转的附件需 ≤ 约 1 MB。压缩会改为 JPEG，并去掉照片里的位置等信息。</div>${c.file.size>IMG_TARGET?'<div class="warn-line">压缩后仍超过 1 MB，无法经中转，需手动发送。</div>':''}
+  <div class="dialog-actions"><button class="primary" id="imC">发送压缩图</button><button id="imO">发送原图</button><button id="imX">取消</button></div>`,()=>{$('imX').onclick=back;$('imC').onclick=()=>{back();go(c.file)};$('imO').onclick=()=>{back();go(f)}})}
 function newChatDlg(pre){ // pre：要写信的对象的公钥
   const my=state.identities.filter(isUnlocked),nm=identitiesOf('member').length;
   if(!my.length)return alert('需要先有一只已建立契约并解锁的灵宠才能发信');
@@ -935,7 +946,7 @@ function chatView(parts){
   const key=keyOf(parts),m=myKeys();
   const arch=!parts.some(k=>m.has(k)),my=arch?[]:state.identities.filter(p=>isUnlocked(p)&&parts.includes(p.encPub)); // 会话至少 1 个成员，一对一也是群会话；arch：会话里没有自己的灵宠，只读
   const menu=`<div id="cMenu" class="cmenu" style="display:none"><button id="cRen">修改会话名</button><button id="cExp">导出本会话</button><button id="cGrp">导出群名片</button>${arch?'':'<button id="cAddM">添加成员</button>'}<button id="cDel" class="danger-text">删除会话</button></div>`;
-  const cmp=my.length?`<div class="comp"><div class="row" style="justify-content:flex-end;gap:14px;margin:0 0 2px"><label class="key-check" id="cPqL" style="display:none"><input type="checkbox" id="cPq" disabled> 抗量子</label><label class="key-check" title="成员昵称将明文写入信件"><input type="checkbox" id="cEnv" checked> 写信封</label></div><div class="mrow" style="flex-wrap:nowrap;margin:0 0 4px"><button type="button" class="tg" id="cSenderT"></button><button type="button" class="tg" id="cMemT"></button></div><div id="cSenderBox" class="pick" style="display:none">${my.map((p,i)=>`<label class="key-check"><input type="radio" name="cSenderR" value="${esc(p.id)}"${i?'':' checked'}> ${whoOf(p.encPub)}</label>`).join('')}</div><div id="cKeys" class="pick" style="display:none"><div class="sub" style="margin:2px 0">默认发给全部成员；只选部分成员时，信件归入仅含所选成员的会话。</div>${parts.map(k=>`<label class="key-check"><input type="checkbox" value="${esc(k)}" checked> ${whoOf(k)}</label>`).join('')}</div><div class="inrow"><button id="cAtt" title="附件（5MB 内随信发送；5~50MB 为大文件，单独保存）">📎</button><textarea id="cText" rows="1" placeholder="输入内容（加密发送）"></textarea><button class="primary" id="cSend">邮寄</button><input type="file" id="cFile" style="display:none"></div><div class="hint">“邮寄”加密并签名生成信件；${NET&&my.some(p=>p.relay)?'启用中转的灵宠经中转站投递，未投递的在结果窗口点“手动”。':'在弹出窗口中复制或分享。'}<br>“写信封”会把成员昵称明文写进信件；你的简介和住地加密在内容里，只有收信人能看到。<br>附件 ≤5MB 随信发送，5~50MB 为大文件，单独保存。</div></div>`:`<div class="warn-line">${arch?'会话中已无你的灵宠，无法解读和发信，仅可导出或删除。':'无可用于发信的灵宠（需已建立契约并解锁）。'}</div>`;
+  const cmp=my.length?`<div class="comp"><div class="row" style="justify-content:flex-end;gap:14px;margin:0 0 2px"><label class="key-check" id="cPqL" style="display:none"><input type="checkbox" id="cPq" disabled> 抗量子</label><label class="key-check" title="成员昵称将明文写入信件"><input type="checkbox" id="cEnv" checked> 写信封</label></div><div class="mrow" style="flex-wrap:nowrap;margin:0 0 4px"><button type="button" class="tg" id="cSenderT"></button><button type="button" class="tg" id="cMemT"></button></div><div id="cSenderBox" class="pick" style="display:none">${my.map((p,i)=>`<label class="key-check"><input type="radio" name="cSenderR" value="${esc(p.id)}"${i?'':' checked'}> ${whoOf(p.encPub)}</label>`).join('')}</div><div id="cKeys" class="pick" style="display:none"><div class="sub" style="margin:2px 0">默认发给全部成员；只选部分成员时，信件归入仅含所选成员的会话。</div>${parts.map(k=>`<label class="key-check"><input type="checkbox" value="${esc(k)}" checked> ${whoOf(k)}</label>`).join('')}</div><div class="inrow"><button id="cAtt" title="附件（5MB 内随信发送；5~50MB 为大文件，单独保存）">📎</button><textarea id="cText" rows="1" placeholder="输入内容（加密发送）"></textarea><button class="primary" id="cSend">邮寄</button><input type="file" id="cFile" style="display:none"></div><div class="hint">“邮寄”加密并签名生成信件；${NET&&my.some(p=>p.relay)?'启用中转的灵宠经中转站投递，未投递的在结果窗口点“手动”。':'在弹出窗口中复制或分享。'}<br>“写信封”会把成员昵称明文写进信件；你的简介和住地加密在内容里，只有收信人能看到。<br>附件 ≤5MB 随信发送（经中转需 ≤1MB，大图可压缩），5~50MB 为大文件，单独保存。</div></div>`:`<div class="warn-line">${arch?'会话中已无你的灵宠，无法解读和发信，仅可导出或删除。':'无可用于发信的灵宠（需已建立契约并解锁）。'}</div>`;
   push(`<div class="cw"><h3 class="ch"><button class="ib" id="cBack" title="返回"><svg width="10" height="18" viewBox="0 0 10 18" aria-hidden="true"><path d="M8 1.5L2 9l6 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span id="cTitleH">${esc(cut(convNameOf(parts),60))}</span><button class="ib" id="cMore" title="更多">⋮</button></h3>${menu}${relHtml}<div id="tl" class="tl"></div>${cmp}</div>`,()=>{
     const tl=$('tl'),list=()=>(convs().find(c=>c.k===key)||{list:[]}).list;
     let selId=null;const paint=(keep)=>{const st=tl.scrollTop,atBot=tl.scrollHeight-st-tl.clientHeight<40,fx=()=>{if(!keep||atBot)tl.scrollTop=tl.scrollHeight};{const e=$('cTitleH');if(e)e.textContent=cut(convNameOf(parts),60)}
@@ -992,7 +1003,10 @@ function chatView(parts){
     $('cSend').onclick=e=>busy(e.target,async()=>{const t=$('cText').value;if(!t.trim())throw new Error('内容不能为空');if(t.length>MAX_TEXT)throw new Error(`字数超过 ${MAX_TEXT} 限制`);await doSend('text',new TextEncoder().encode(t),{})});
     $('cAtt').onclick=()=>$('cFile').click();
     {const ta=$('cText');ta.oninput=()=>{DRAFTS[key]=ta.value;ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,120)+'px'};ta.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();$('cSend').click()}};ta.value=DRAFTS[key]||'';if(ta.value)ta.oninput()}
-    $('cFile').onchange=()=>busy($('cSend'),async()=>{const f=$('cFile').files[0];$('cFile').value='';if(!f)return;if(f.size>MAX_BIG)throw new Error('文件超出 '+MAX_BIG/1048576+'MB 限制');if(f.size>MAX_FILE)return bigPrep(f);await doSend('file',new Uint8Array(await f.arrayBuffer()),{filename:f.name,mime:f.type})});
+    const sendFile=async f=>{if(f.size>MAX_BIG)throw new Error('文件超出 '+MAX_BIG/1048576+'MB 限制');if(f.size>MAX_FILE)return bigPrep(f);await doSend('file',new Uint8Array(await f.arrayBuffer()),{filename:f.name,mime:f.type})},run=f=>busy($('cSend'),()=>sendFile(f));
+    $('cFile').onchange=()=>{const f=$('cFile').files[0];$('cFile').value='';if(!f)return;
+      if(!imgBig(f)||f.size>MAX_BIG||!(f.size>MAX_FILE||(NET&&my.some(p=>p.relay))))return run(f); // 大图：要走中转或超过 5MB 时，先提供压缩
+      busy($('cSend'),async()=>{let c;try{c=await shrinkImg(f)}catch{}if(!c||c.file.size>=f.size)return sendFile(f);imgDlg(f,c,run)})};
   },true);
 }
 function addMemberDlg(parts){ // 会话由参与者集合决定：加人 = 进入包含新成员的新会话（原会话成为它的子会话）；新成员读不到旧信
@@ -1046,7 +1060,7 @@ async function relayRead(parts){ // 已读回执：打开会话时，向寄信�
   if(reading||!NET)return;await warmProf(parts);const M=myKeys(),key=keyOf(parts),g=new Map(),now=Date.now(),pets=state.identities.filter(p=>p.relay&&isUnlocked(p));
   if(!pets.length)return;
   for(const b of state.letters){
-    if(M.has(b.sender.encPub)||keyOf(partsOf(b))!==key)continue;const e=state.reads[b.id];if(e&&e.s)continue; // s：旧版记录，视为已发完；新版用 sd 记录已发回执的灵宠 id
+    if(M.has(b.sender.encPub)||keyOf(partsOf(b))!==key)continue;const e=state.reads[b.id];
     const sp=idx().identities.get(b.sender.encPub),sfp=sp?sp.id:b.sender.id,sr=relayOf(sp?sp.relayUrl:(PROF.get(b.sender.encPub)||{}).relayUrl),sent=new Set(e&&e.sd||[]);
     if(!sfp||!sr||!relayOn(sr)||!relayDue(sr))continue;
     for(const rp of pets){if(busyOf(rp,sr)||!b.recipientKeys.includes(rp.encPub)||sent.has(rp.id)||(ps(rp,sr).rt[b.id]||0)>now)continue;const gk=sr+'|'+sfp+'|'+rp.id;if(!g.has(gk))g.set(gk,{sr,sfp,rp,ids:[]});g.get(gk).ids.push(b.id)}}
@@ -1066,7 +1080,7 @@ const habTip=(b,el)=>{ // 该寄信人的最新一封信里的住地，与联系
 const senderName=b=>{const p=state.identities.find(x=>x.encPub===b.sender.encPub);return p?(p.remark||p.nickname)+(p.group==='verified'&&!isOwned(p)?' V':''):b.sender.nickname}; // 本地已有的灵宠用本地名称；信里自报的昵称不可信
 
 function mergeNames(o){if(!o||typeof o!=='object')return;const cn=state.meta.convNames||(state.meta.convNames={});for(const k of Object.keys(o).slice(0,2000)){const v=o[k];if(typeof v==='string'&&v.trim()&&!cn[k]&&k.length<=5000)cn[k]=v.slice(0,30)}}
-function mergeReads(o){if(!o||typeof o!=='object')return;const ids=new Set(state.letters.map(b=>b.id));for(const i of Object.keys(o)){if(!ids.has(i))continue;const n=cleanReads(o[i]),c=state.reads[i]||{dl:[],rd:[]};state.reads[i]={dl:[...new Set([...c.dl,...n.dl])],rd:[...new Set([...c.rd,...n.rd])],...((c.s||n.s)?{s:1}:{}),...((c.sd||n.sd)?{sd:[...new Set([...(c.sd||[]),...(n.sd||[])])]}:{}),...((c.rr||n.rr)?{rr:c.rr||n.rr}:{})}}}
+function mergeReads(o){if(!o||typeof o!=='object')return;const ids=new Set(state.letters.map(b=>b.id));for(const i of Object.keys(o)){if(!ids.has(i))continue;const n=cleanReads(o[i]),c=state.reads[i]||{dl:[],rd:[]};state.reads[i]={dl:[...new Set([...c.dl,...n.dl])],rd:[...new Set([...c.rd,...n.rd])],...((c.sd||n.sd)?{sd:[...new Set([...(c.sd||[]),...(n.sd||[])])]}:{}),...((c.rr||n.rr)?{rr:c.rr||n.rr}:{})}}}
 function mergeHandoff(o){if(!o||typeof o!=='object')return;const ids=new Set(state.letters.map(b=>b.id));for(const i of Object.keys(o))if(ids.has(i)&&!state.handoff[i])state.handoff[i]=cleanHandoff(o[i])}
 async function addLetters(data,strict){ // strict：收信时要求收件人里有自己的灵宠；恢复备份不要求
   // 以 id 为唯一标识：相同 id 且签名一致视为已存在；内容不同一律拒绝，不覆盖
@@ -1304,7 +1318,6 @@ $('btnDImp').onclick=()=>push(`<h3>恢复数据</h3><div class="hint">选择备�
     if(!d||d.format!=='spirit-space-data'||!Array.isArray(d.identities)||!Array.isArray(d.letters))throw new Error('不是灵宠空间数据文件');
     if(!Number.isInteger(d.schema))throw new Error('备份文件缺少数据版本');
     if(d.schema>DATA_SCHEMA)throw new Error(`备份文件的数据版本（${d.schema}）高于本页支持的版本（${DATA_SCHEMA}），请先升级本页`);
-    d=migrate(d);
     let msg;
     if($('dMode').value==='r'){
       if((state.identities.length||state.letters.length)&&!confirm('替换会清除当前空间里的所有灵宠和信件，确认继续？'))return;
@@ -1400,7 +1413,7 @@ async function verInfo(){
     const t=s.textContent,hs='sha256-'+await sha256b64(t);
     rows.push(`  ${t.length<500?'提示脚本':'主脚本　'}　${hs}　${csp.includes("'"+hs+"'")?'✓ 与页面 CSP 登记一致':'✗ 未在页面 CSP 中登记'}`);
   }
-  return `版本　${state.meta.version}\n发版时间　${when}\n\n数据版本\n  数据结构　${DATA_SCHEMA}（备份文件 / 本地库）\n  信件协议　${LETTER_V}（信件字段 v）\n  口令封装　${SEAL_V}（sealedKeys.v）\n密码套件　${SUITES.join(' / ')}（c1 = X25519 + Ed25519 + AES-256-GCM；h1 = c1 + MLKEM768-X25519 混合封装；进入指纹、名片、信件和 AAD）\n兼容规则\n  高于本页支持的版本：拒绝读取并提示升级，不改动已有数据\n  低于本页的数据结构版本：经 migrate() 逐级升级后读取\n  密码学域标签（…/v2、…/v3）独立于上述版本，仅在算法构造改变时更换\n本地数据上次写入的应用版本　${prevVer||'无'}\n联网范围（CSP connect-src）　${cn}\n\n脚本 SHA-256（本页实测）\n${rows.join('\n')}`;
+  return `版本　${state.meta.version}\n发版时间　${when}\n数据结构 ${DATA_SCHEMA} · 信件协议 ${LETTER_V} · 口令封装 ${SEAL_V}\n密码套件　${SUITES.join(' / ')}\n联网范围（CSP connect-src）　${cn}\n\n脚本 SHA-256（本页实测）\n${rows.join('\n')}`;
 }
 $('btnVer').onclick=e=>{e.preventDefault();
   push(`<h3>版本信息</h3><div class="content-box" id="verBox" style="font-family:monospace;font-size:12px">计算中…</div>
@@ -1441,7 +1454,7 @@ if(!(window.crypto&&crypto.subtle)){document.body.insertAdjacentHTML('afterbegin
     if(bad.length){document.body.insertAdjacentHTML('afterbegin','<div class="env-warn">当前浏览器不支持 '+bad.join(' / ')+'，加密功能不可用。X25519 需 Chrome 133+，Ed25519 需 Chrome 137+；Firefox 130+、Safari 17+（iOS / iPadOS 17+）</div>');document.querySelectorAll('button').forEach(b=>{if(b.id!=='btnHelp')b.disabled=true})}}
   if(window.indexedDB&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
     try{idb=await idbOpen();const core=await idbDo('readonly',s=>s.get('core')),ls=await new Promise((res,rej)=>{const r=idb.transaction('letters','readonly').objectStore('letters').getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
-    if(core&&core.schema>DATA_SCHEMA){newer=true;throw 0}if(core||ls.length){state=normalize({...(core||{}),letters:ls});prevVer=state.meta.version||'';state.letters.sort((a,b)=>a.timestamp<b.timestamp?1:a.timestamp>b.timestamp?-1:0)}
+    if(core&&core.schema>DATA_SCHEMA){newer=true;throw 0}if(core||ls.length){state=normalize({...(core||{}),letters:ls});state.letters.sort((a,b)=>a.timestamp<b.timestamp?1:a.timestamp>b.timestamp?-1:0)}
     state.meta.version=VERSION;saved=new Map(state.letters.map(b=>[b.id,b]));savedCore=coreJson();savedRev=(core&&core.rev)||0;try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch{}}catch{idb=null}
   }
   const cw=$('closeWarn');cw.textContent=modeText();if(idb)cw.style.color='var(--muted)';if(newer){document.body.insertAdjacentHTML('afterbegin','<div class="env-warn">本地数据由更新版本写入，本页版本过旧，已停止读写本地数据。</div>');cw.textContent='数据版本过新，本页不读写本地数据'}
