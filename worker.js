@@ -10,7 +10,11 @@
 //  · 超额返回 429 {error:'busy', retry:秒}，客户端把该灵宠标为“中转·忙”
 //  · 代客续座：整点闹钟给“座位将到期（或刚到期）、且最近 IDLE_RENEW_D 天内取过信”的灵宠续座，用户关机也不掉座；活动时间由取信顺带记录（每小时最多写一次）
 //  · 离座：灵宠换住地 / 关中转 / 解除契约时签名调用 /v1/box/leave，立刻撤掉座位，别人不能再向它投信；箱里已有的信和回执留到过期清理
-// 环境变量（可选）：ALLOW_ORIGINS、MAX_SEATS、MAX_SEATS_PER_IP、DAY_BUDGET、SOFT_PER_MIN
+// 座位发放方式（SEAT_MODE）：open（默认）= 先到先得；invite（邀请制）= 只有“站主灵宠”（指纹在 HOSTS 里），或被某个站主座位的允许名单列入的灵宠，才能开座和续座。
+//  · 只管谁能在本站开信箱；投信、取信、回执规则不变（投信只看寄信人是否在收信人的名单里，不要求寄信人在本站有座位）
+//  · 准入不传递：只有站主的允许名单算数；站主缩小名单时，被移出且不再被任何站主允许的座位立刻撤销；站主座位无条件代客续座
+//  · 陌生人开座被拒时不产生任何写入；邀请制下向没有任何有效座位的人投信也不扣额度
+// 环境变量（可选）：ALLOW_ORIGINS、MAX_SEATS、MAX_SEATS_PER_IP、DAY_BUDGET、SOFT_PER_MIN、SEAT_MODE（open|invite）、HOSTS（站主灵宠指纹，逗号或空格分隔；只放公开指纹，不含密钥）
 import {DurableObject} from 'cloudflare:workers';
 const TTL=7*86400, MAX_LETTER=1450000, MAX_BODY=1500000, MAX_ALLOW=200, MAX_TO=50, MAX_FETCH=20, MAX_RD=40, MAX_RESP=12e6, SKEW=5*60*1000;
 const MAX_SEATS=50, SEAT_MIN_H=24, SEAT_MAX_H=48, TIGHT_MIN_H=6, TIGHT_MAX_H=12, TIGHT_RATIO=0.8, RENEW_LEFT_H=4, MAX_BOX_N=30, MAX_RC=200, MAX_ADD_CHANGES=10, MAX_SEATS_PER_IP=10;
@@ -49,7 +53,9 @@ export class Relay extends DurableObject{
     ctx.blockConcurrencyWhile(async()=>{if(!await ctx.storage.getAlarm())await ctx.storage.setAlarm(Date.now()+36e5)})}
   async alarm(){ // 每小时清理过期数据
     const now=Date.now(),hr=Math.floor(now/36e5),n=this.seatCount();
-    for(const r of this.rows('SELECT fp FROM seat WHERE exp<? AND la>?',now+RENEW_LEFT_H*36e5,now-IDLE_RENEW_D*864e5))this.sql.exec('UPDATE seat SET exp=? WHERE fp=?',now+this.ttlOf(n)*1000,r.fp); // 代客续座，须在清理过期座位之前
+    const H=this.hostSet(),due=this.rows('SELECT fp,la FROM seat WHERE exp<?',now+RENEW_LEFT_H*36e5),renew=fp=>this.sql.exec('UPDATE seat SET exp=? WHERE fp=?',now+this.ttlOf(n)*1000,fp);
+    for(const r of due)if(H.has(r.fp))renew(r.fp); // 站主座位无条件续：它一掉，名单随之失效；先于其他座位处理，下面的准入检查才读得到
+    for(const r of due)if(!H.has(r.fp)&&(r.la||0)>now-IDLE_RENEW_D*864e5&&this.admitted(r.fp))renew(r.fp); // 代客续座（邀请制下须仍被准入），须在清理过期座位之前
     this.sql.exec('DELETE FROM mail WHERE t<?',now-TTL*1000);this.sql.exec('DELETE FROM rc WHERE t<?',now-TTL*1000);
     this.sql.exec('DELETE FROM seat WHERE exp<?',now);this.sql.exec('DELETE FROM ipseat WHERE t<?',now-SEAT_MAX_H*36e5);this.sql.exec('DELETE FROM q WHERE h<?',hr-1);
     await this.ctx.storage.setAlarm(now+36e5)}
@@ -58,6 +64,9 @@ export class Relay extends DurableObject{
   seatOf(fp){const a=this.one('SELECT l,exp,ch,la FROM seat WHERE fp=?',fp);return a&&a.exp>Date.now()?{l:JSON.parse(a.l),exp:a.exp,ch:JSON.parse(a.ch),la:a.la||0}:null}
   seatCount(){return this.one('SELECT COUNT(*) c FROM seat WHERE exp>?',Date.now()).c}
   ttlOf(n){const s=num(this.env.MAX_SEATS,MAX_SEATS),t=n>=s*TIGHT_RATIO,lo=t?TIGHT_MIN_H:SEAT_MIN_H,hi=t?TIGHT_MAX_H:SEAT_MAX_H;return Math.floor((lo+Math.random()*(hi-lo))*3600)} // 座位够用 24~48 小时随机；吃紧 6~12 小时随机
+  inviteOn(){return String(this.env.SEAT_MODE||'').trim().toLowerCase()==='invite'}
+  hostSet(){return this.inviteOn()?new Set(String(this.env.HOSTS||'').split(/[\s,]+/).filter(x=>ID_RE.test(x))):new Set()}
+  admitted(fp){if(!this.inviteOn())return true;const H=this.hostSet();if(H.has(fp))return true;for(const h of H){const a=this.seatOf(h);if(a&&a.l.includes(fp))return true}return false} // 站主，或在某个有效站主座位的允许名单里
   activeN(){const t=Date.now()-ACTIVE_MS;let n=0;for(const[k,v]of this.act)if(v>t)n++;else this.act.delete(k);return n}
   soft(fp){const now=Date.now(),s=this.hit.get(fp);if(this.hit.size>2000)for(const[k,v]of this.hit)if(now-v.t>6e4)this.hit.delete(k);if(!s||now-s.t>6e4){this.hit.set(fp,{t:now,n:1});return false}return ++s.n>num(this.env.SOFT_PER_MIN,SOFT_PER_MIN)}
   budget(fp){ // 当前额度状态（不扣费）
@@ -70,6 +79,7 @@ export class Relay extends DurableObject{
     this.sql.exec('INSERT OR REPLACE INTO q VALUES(?,?,?)',fp,b.hr,b.s+cost);
     this.sql.exec("INSERT OR REPLACE INTO meta VALUES('m',?)",JSON.stringify({day:b.day,hr:b.hr,hp:b.hp,hs:b.hs+cost,used:b.used+cost+2}));return 0} // +2：记账本身的两行写入
   drop(sfp,id,v,to){
+    if(this.inviteOn()&&!to.some(fp=>{const a=this.seatOf(fp);return a&&a.l.includes(sfp)}))return[200,{ok:1,accepted:[],rejected:to,full:[],ttl:TTL}]; // 邀请制：没有任何收信人会收，不扣额度、不写库
     const w=this.charge(sfp,to.length*DROP_COST);if(w)return[429,{error:'busy',retry:w}]; // 按寄信灵宠计；向没开通的信箱乱投也要付费
     const now=Date.now(),accepted=[],rejected=[],full=[];
     for(const fp of to){const a=this.seatOf(fp);
@@ -78,18 +88,23 @@ export class Relay extends DurableObject{
       this.sql.exec('INSERT OR REPLACE INTO mail VALUES(?,?,?,?)',fp,id,v,now);accepted.push(fp)}
     return[200,{ok:1,accepted,rejected,full,ttl:TTL}]}
   allow(fp,list,rn,ip){ // 占座/更新名单；续期与名单一起签名
+    const inv=this.inviteOn(),H=this.hostSet(),isHost=H.has(fp);
+    if(inv&&!isHost&&!this.admitted(fp)){if(this.one('SELECT 1 x FROM seat WHERE fp=?',fp))this.sql.exec('DELETE FROM seat WHERE fp=?',fp);return[403,{error:'invite'}]} // 未被准入：拒绝（已有座位一并撤销）；检查在扣费之前，陌生人不产生写入
     const now=Date.now(),live=this.seatOf(fp),adds=live?list.filter(x=>!live.l.includes(x)).length:list.length; // 只限制“扩大”名单；收紧永远允许
     const need=!live||(rn&&live.exp-now<RENEW_LEFT_H*36e5);
     if(live&&adds===0&&live.l.length===list.length&&!need)return[200,{ok:1,n:list.length,exp:live.exp}];
     const w=this.charge(fp,live?1:2);if(w)return[429,{error:'busy',retry:w}];
     const ch=(live?live.ch:[]).filter(t=>now-t<864e5);let used=null;
-    if(!live){const seats=num(this.env.MAX_SEATS,MAX_SEATS),perIp=num(this.env.MAX_SEATS_PER_IP,MAX_SEATS_PER_IP);used=this.seatCount();if(used>=seats)return[503,{error:'seat full'}];
-      const arr=this.rows('SELECT fp FROM ipseat WHERE ip=? AND t>?',ip,now-SEAT_MAX_H*36e5);
-      if(!arr.some(x=>x.fp===fp)&&arr.length>=perIp)return[429,{error:'too many seats from this network'}]; // 同一网络 48 小时内最多 N 个不同的信箱
-      this.sql.exec('INSERT OR REPLACE INTO ipseat VALUES(?,?,?)',ip,fp,now)}
+    if(!live){const seats=num(this.env.MAX_SEATS,MAX_SEATS),perIp=num(this.env.MAX_SEATS_PER_IP,MAX_SEATS_PER_IP);used=this.seatCount();
+      if(!isHost){ // 站主不受座位总数和网络配额限制
+        if(used>=seats)return[503,{error:'seat full'}];
+        const arr=this.rows('SELECT fp FROM ipseat WHERE ip=? AND t>?',ip,now-SEAT_MAX_H*36e5);
+        if(!arr.some(x=>x.fp===fp)&&arr.length>=perIp)return[429,{error:'too many seats from this network'}]; // 同一网络 48 小时内最多 N 个不同的信箱
+        this.sql.exec('INSERT OR REPLACE INTO ipseat VALUES(?,?,?)',ip,fp,now)}}
     if(adds>0){if(ch.length>=MAX_ADD_CHANGES)return[429,{error:'too many changes'}];ch.push(now)}
     const exp=need?now+this.ttlOf(used==null?this.seatCount():used)*1000:live.exp;
     this.sql.exec('INSERT OR REPLACE INTO seat(fp,l,exp,ch,la) VALUES(?,?,?,?,?)',fp,JSON.stringify(list),exp,JSON.stringify(ch),now);
+    if(isHost&&live)for(const x of live.l)if(!list.includes(x)&&!H.has(x)&&this.one('SELECT 1 x FROM seat WHERE fp=?',x)&&!this.admitted(x))this.sql.exec('DELETE FROM seat WHERE fp=?',x); // 站主缩小名单：被移出且不再被任何站主允许的座位立刻撤销
     return[200,{ok:1,n:list.length,exp}]}
   pull(fp){ // 取信：一次查询；不扣预算，只限频
     const now=Date.now();this.act.set(fp,now);if(this.soft(fp))return[429,{error:'busy',retry:30}];
@@ -106,7 +121,7 @@ export class Relay extends DurableObject{
   rdack(fp,rd){for(const x of rd)this.sql.exec('DELETE FROM rc WHERE fp=? AND by=? AND id=?',fp,x.by,x.id);return[200,{ok:1}]}
   ack(fp,ids){for(const i of ids)this.sql.exec('DELETE FROM mail WHERE fp=? AND id=?',fp,i);return[200,{ok:1}]}
   leave(fp){if(this.soft(fp))return[429,{error:'busy',retry:30}];this.sql.exec('DELETE FROM seat WHERE fp=?',fp);return[200,{ok:1}]} // 离座：只撤座位；信和回执留到过期清理，座位名额占用的网络配额（ipseat）也不退
-  quota(fp){const b=this.budget(fp);return[200,{ok:1,room:Math.floor(b.room),floor:Math.floor(b.fl),cap:Math.floor(b.fl*BORROW),spent:Math.floor(b.s),hp:Math.floor(b.hp),hs:Math.floor(b.hs),used:Math.floor(b.used),budget:b.D,active:b.act,seats:this.seatCount(),maxSeats:num(this.env.MAX_SEATS,MAX_SEATS),resetIn:b.retry}]}
+  quota(fp){const b=this.budget(fp);return[200,{ok:1,room:Math.floor(b.room),floor:Math.floor(b.fl),cap:Math.floor(b.fl*BORROW),spent:Math.floor(b.s),hp:Math.floor(b.hp),hs:Math.floor(b.hs),used:Math.floor(b.used),budget:b.D,active:b.act,seats:this.seatCount(),maxSeats:num(this.env.MAX_SEATS,MAX_SEATS),resetIn:b.retry,mode:this.inviteOn()?'invite':'open',host:this.hostSet().has(fp)}]}
 }
 
 export default{
@@ -114,7 +129,7 @@ export default{
     try{
       const ao=(env.ALLOW_ORIGINS||'').split(',').map(x=>x.trim()).filter(Boolean),og=req.headers.get('Origin');
       if(ao.length&&og&&og!=='null'&&!ao.includes(og))return reply({error:'origin'},403); // 只挡第三方网页；本地文件（null）和非浏览器客户端不受限，不能当作授权
-      if(new URL(req.url).pathname==='/v1/check')return reply({ok:1,do:!!(env.RELAY&&env.RELAY.idFromName),v:2}); // 连通性检测：只报告绑定是否存在
+      if(new URL(req.url).pathname==='/v1/check')return reply({ok:1,do:!!(env.RELAY&&env.RELAY.idFromName),v:2,seats:String(env.SEAT_MODE||'').trim().toLowerCase()==='invite'?'invite':'open'}); // 连通性检测：只报告绑定是否存在
       if(req.method!=='OPTIONS'&&!(env.RELAY&&env.RELAY.idFromName))return reply({error:'Durable Object 绑定缺失：请添加名为 RELAY 的绑定（类 Relay，SQLite 版），见 wrangler.toml'},500);
       return await handle(req,env);
     }catch(e){return reply({error:'server error: '+(e&&e.message||e)},500)}
