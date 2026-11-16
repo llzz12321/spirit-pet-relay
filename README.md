@@ -6,7 +6,7 @@
 
 ### 中转站部署（可选）（Cloudflare Worker） 
 
-拿worker.js和wrangler.toml两个文件去问AI怎么部署就行了，不维护readme了。
-
+1、Cloudflare Worker怎么部署去问AI就行了
+2、中转站转其他语言，或放在墙内小圈子用，让AI去做吧
 
 小圈子（< 10 人）完全够用。
