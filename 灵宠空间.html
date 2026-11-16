@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>灵宠空间</title>
 <meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><meta name="release-time" content="2026-11-15T18:00:00Z">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-zP53jgzhHJ1V3vPcX9jpsguRlj1upJBSm4FZjXeTp+Y='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src https:; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; object-src 'none'; script-src 'sha256-6Vg4bmtM/yR3BlNiqU57Ncv+z6rzFCw2LURAjujZmxI=' 'sha256-lyQd1q+uw2COn0vbtEGb82NEV0smKuh8jc3xBRVR/UE='; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; connect-src https:; form-action 'none'; base-uri 'none'">
 <style>
 :root{--bg:#f5f5f4;--panel:#fff;--border:#e0ddd6;--text:#2a2823;--muted:#6f6c63;--accent:#3c6e5c;--danger:#b3452f;--warn:#8a5a1f}
 *{box-sizing:border-box}
@@ -698,7 +698,7 @@ function editDlg(p){ // 已建立契约的灵宠可修改昵称和自我介绍
     <label>昵称</label><input type="text" id="edNick" maxlength="30"><label>自我介绍（可空）</label><textarea id="edAbout" maxlength="200"></textarea><label>备注（仅本地，不写入名片，可空）</label><input type="text" id="edRemark" maxlength="30">${NET?`<label>住地（可空）</label>${habInput('edHab')}<div class="row" style="justify-content:space-between;flex-wrap:nowrap;margin-top:4px"><label class="key-check" style="margin:0"><input type="checkbox" id="edRelay"> 启用中转站</label><button type="button" class="rl" id="edQuota">检测额度</button></div><label>允许谁向我投信</label><select id="edAllow">${Object.keys(SCOPES).map(x=>`<option value="${x}">${SCOPES[x]}</option>`).join('')}</select>`:''}
     <div class="dialog-actions"><button class="primary" id="edGo">保存</button><button id="edBack">取消</button></div>`,()=>{
     $('edNick').value=p.nickname;$('edAbout').value=p.about||'';$('edRemark').value=p.remark||'';if($('edHab'))$('edHab').value=relayOf(p.relayUrl);if($('edAllow'))$('edAllow').value=p.allow||'friend';if($('edRelay'))$('edRelay').checked=!!p.relay;if($('edQuota'))$('edQuota').onclick=e=>busy(e.target,()=>quotaCheck(p,$('edHab').value));$('edBack').onclick=back;
-    $('edGo').onclick=()=>{const n=$('edNick').value.trim().slice(0,30);if(!n)return alert('昵称不能为空');const hv=habRead('edHab');if(hv===null)return;if($('edRelay')&&$('edRelay').checked&&!hv)return alert('启用中转需先填写住地');if($('edRelay')&&$('edRelay').checked&&!p.relay&&relayN()>=MAX_RELAY)return alert(`最多同时启用 ${MAX_RELAY} 只灵宠的中转。请先在其他灵宠上关闭中转。`);const oR=relayOf(p.relayUrl),was=!!p.relay;p.nickname=n;p.about=$('edAbout').value.trim().slice(0,200);p.remark=$('edRemark').value.trim().slice(0,30);if($('edHab')){if(OPEN&&hv&&!relayOn(hv)&&confirm('「'+hv.replace(/^https:\/\//,'')+'」尚未放行。放行后，对方能看到你的 IP、灵宠公钥和指纹、加密信件及收发时间。现在放行？'))approveRelays([hv]);p.relayUrl=hv}if($('edAllow'))p.allow=$('edAllow').value;if($('edRelay')){if($('edRelay').checked)p.relay=1;else delete p.relay}if(oR&&was&&(!p.relay||relayOf(p.relayUrl)!==oR))relayLeave(p,oR);renderIdentities();closeAll();if(p.relay){if(relayOn(relayOf(p.relayUrl)))relayPull(false);else toast('中转配置中未允许该中转站')}identityDlg(p)};
+    $('edGo').onclick=()=>{const n=$('edNick').value.trim().slice(0,30);if(!n)return alert('昵称不能为空');const hv=habRead('edHab');if(hv===null)return;if($('edRelay')&&$('edRelay').checked&&!hv)return alert('启用中转需先填写住地');if($('edRelay')&&$('edRelay').checked&&!p.relay&&relayN()>=MAX_RELAY)return alert(`最多同时启用 ${MAX_RELAY} 只灵宠的中转。请先在其他灵宠上关闭中转。`);const oR=relayOf(p.relayUrl),was=!!p.relay;p.nickname=n;p.about=$('edAbout').value.trim().slice(0,200);p.remark=$('edRemark').value.trim().slice(0,30);if($('edHab')){if(OPEN&&hv&&!relayOn(hv)&&confirm('「'+hv.replace(/^https:\/\//,'')+'」尚未放行。放行后，该中转站可能得到你的IP地址、灵宠公钥和指纹、加密信件及收发时间。现在放行？'))approveRelays([hv]);p.relayUrl=hv}if($('edAllow'))p.allow=$('edAllow').value;if($('edRelay')){if($('edRelay').checked)p.relay=1;else delete p.relay}if(oR&&was&&(!p.relay||relayOf(p.relayUrl)!==oR))relayLeave(p,oR);renderIdentities();closeAll();if(p.relay){if(relayOn(relayOf(p.relayUrl)))relayPull(false);else toast('中转配置中未允许该中转站')}identityDlg(p)};
   });
 }
 function remarkDlg(p){
@@ -1138,7 +1138,7 @@ function renderRelay(){const e=$('netBox');if(!e)return;e.style.display='';
 function relayMgr(){
   const cm=relayCands(),cand=[...cm].slice(0,300),on=[...(state.meta.relayOn||[])];
   const lst=(a,f)=>a.map(r=>`<label class="key-check"><input type="checkbox" data-u="${esc(r)}"> <span class="nm">${esc(r.replace(/^https:\/\//,''))}</span>${f(r)}</label>`).join('')||'<div class="sub">（无）</div>';
-  push(`<h3>管理中转站</h3><div class="hint">只有放行的中转站才会被访问。放行后，对方能看到你的 IP、灵宠公钥和指纹、加密信件及收发时间，请只放行信任的站点。联系人名片里的新住地会先列在“待放行”。</div>
+  push(`<h3>管理中转站</h3><div class="hint">只有放行的中转站才会被访问。放行后，该中转站可能得到你的IP地址、灵宠公钥和指纹、加密信件及收发时间，请只放行信任的站点。联系人名片里的新住地会先列在“待放行”。</div>
     <label>添加地址</label><div class="inrow"><input type="text" id="mgAdd" placeholder="https://relay.example.com" autocapitalize="off" autocomplete="off" spellcheck="false"><button id="mgAddGo">检测并放行</button></div>
     <div class="grp">待放行（${cm.size}）</div><div class="pick" id="mgC" style="max-height:220px">${lst(cand.map(x=>x[0]),r=>{const w=cm.get(r)||[];return w.length?`<span class="ab">（${esc(w.join('、'))}）</span>`:''})}</div>
     <div class="row" style="margin-top:4px"><button class="rl" id="mgCAll">全选</button><button class="primary rl" id="mgCGo">检测并放行所选</button></div>
@@ -1262,7 +1262,6 @@ $('btnClear').onclick=()=>{
   const fl=state.letters.filter(b=>b.kind==='file'),mb=(fl.reduce((n,b)=>n+b.ciphertext.length*.75,0)/1048576).toFixed(1),cur=state.meta.autoClean||365;
   push(`<h3>清理数据</h3><div class="hint dflt" id="stInfo">自动清理按信件时间定期删除旧信，手动清理立即执行；两者都不可恢复。</div>
     <div class="grp">自动清理信件</div>
-    <div class="sub">信件时间早于所选期限的，打开页面时自动删除；灵宠和灵枢不受影响。</div>
     <div class="row" style="margin-top:6px;flex-wrap:nowrap"><select id="clAuto" style="flex:1;min-width:0;width:auto">${AUTO_OPTS.map(([v,t])=>`<option value="${v}"${v===cur?' selected':''}>${t}前的信件</option>`).join('')}</select><button class="primary" id="clAutoGo">应用</button></div>
     <div class="grp" style="margin-top:16px">手动清理（立即执行）</div>
     <select id="clMode"><option value="f">只清附件（${fl.length} 个，约 ${mb} MB）；其余保留</option><option value="l">清空全部信件；保留灵宠和灵枢</option><option value="a">清空全部：灵宠、灵枢和信件</option></select>
@@ -1347,7 +1346,7 @@ $('btnHelp').onclick=()=>push(`<h3>关于</h3>
   <li>A 在灵宠的“名片·操作”中复制名片发给 B；B 在“好友”页签“添加好友灵宠”导入。反向同理。</li>
   <li>“写信”→“邮寄”，在弹出的窗口复制或分享给对方；对方点“收信·手动”粘贴。较长的信用“分享(txt)”以文件发送。收到文件时：先预览确认收件人（txt 开头附近的 envelopeNames），再用其他应用打开并复制全文（安卓可选 Chrome 全选复制；iOS 选“拷贝”），回到本页“收信·手动”粘贴；也可保存文件后在“收信·手动”中选择“导入”。</li></ol>
   <b>进阶</b>
-  <ol><li><b>添加到主屏幕</b>：以应用方式全屏打开，iOS 不会清除其本地数据。用 Safari 或 Chrome 打开 https:// 页面→“分享/菜单”→“添加到主屏幕”。内置浏览器不支持；iOS 主屏幕应用与 Safari 标签页数据相互独立，须先备份再恢复。</li>
+  <ol><li><b>添加到手机桌面</b>：打开 https:// 页面，Safari（iOS）→“分享/菜单”→“添加到主屏幕”，Edge→“菜单”→“添加至手机”、Chrome→“菜单”→“安装并创建快捷方式”。</li>
   <li><b>收藏</b>：把本页或模板 HTML 加入微信收藏。</li>
   ${BULLETIN?`<li><b>张贴栏</b>：在<a href="${esc(BULLETIN)}" target="_blank" rel="noopener noreferrer">张贴栏</a>${BULLETIN_EXP?`（有效期至 ${esc(BULLETIN_EXP)}）`:''}发布或领取名片。仅发布名片，勿发布 _private 内容。</li>`:''}
   <li><b>换新名片</b>：在旧灵宠的“名片·操作”→“更多方式”中点“换新名片”，将生成的名片发给联系人，对方导入后自动替换。</li></ol>
